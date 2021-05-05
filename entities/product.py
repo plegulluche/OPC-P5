@@ -7,7 +7,6 @@ class Product:
         self.nutriscore = nutriscore
         self.productname = str(productname)
         self.linktourl = linktourl
-        self.primarykey = 0
         self.categories = categories
         self.shop = shop
 

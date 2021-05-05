@@ -10,7 +10,6 @@ class Shops:
         """__init__ Method of the Shops class"""
         
         self.shopname = name
-        self.shopid = 0
     
 
     def __repr__(self):

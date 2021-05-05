@@ -48,6 +48,7 @@ DROP TABLE IF EXISTS `Product`;
 CREATE TABLE `Product` (
   `productID` int NOT NULL AUTO_INCREMENT,
   `shopID` int DEFAULT NULL,
+  `nutriScore` VARCHAR(1),
   `productName` varchar(80) NOT NULL,
   `linkToURLOFF` varchar(300) NOT NULL,
   PRIMARY KEY (`productID`)
