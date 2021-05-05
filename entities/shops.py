@@ -6,8 +6,17 @@ class Shops:
     """description of the shops class"""
 
 
-    def __init__(self):
+    def __init__(self,name):
         """__init__ Method of the Shops class"""
-        self.shopid = shopID
-        self.shopname = shopname
         
+        self.shopname = name
+        self.shopid = 0
+    
+
+    def __repr__(self):
+        """display Product in console"""  #TODO: make the repr method display the name of the product accessing the product name attribute.
+        return self.shopname
+    
+    def __str__(self):
+        """display Product object for print method"""
+        return repr(self)
