@@ -1,15 +1,16 @@
 import json
-# from dbcreator import Dbmanager
+# # from dbcreator import Dbmanager
 from apimanager import Apimanager
 from datacleaner import Datacleaner
 
-# from writemanager import Writemanager
+# # from writemanager import Writemanager
 
-import mysql.connector
-import config
+# import mysql.connector
+# import config
 
-api = Apimanager()
-print(api.geteightcategories())
-# data = Datacleaner()
 
-# print(data.createcategoryobject())
+Data = Datacleaner()
+
+Data.createcategoryobject()
+Data.createproductobject()
+Data.createshopobjects()

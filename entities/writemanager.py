@@ -4,7 +4,7 @@ import mysql.connector
 from mysql.connector import errorcode
 
 import config
-from apimanager import Apimanager
+from datacleaner import Datacleaner
 
 class Writemanager:
 
@@ -18,17 +18,13 @@ class Writemanager:
 
     def writecategories(self):                  #for category we call Apimanager.createcategoryobject(Apimanager.getsixcategories()) , 
                                                             #An Apimanager instance need to be created beforehand.OR NOT ? (inside function ? )
-        api = Apimanager()
-        apicate = api.createcategoryobject()
+        data = Datacleaner()
+        categoryapi = data.createcategoryobject()
         self.cnxvar                      #using with statement so the connection and the cursor are closed after usage.
         self.cnxcursor
-        primary = 0
         for categorie in apicate:
-            categorie.primarykey = primary + 1
-            primary += 1
-            print(categorie.primarykey, categorie.categoryname)
-            query = "INSERT INTO Category (categoryID, categoryName) VALUES (%s, %s)"
-            val = (categorie.primarykey,categorie.categoryname)
+            query = "INSERT INTO Category (categoryName) VALUES (%s)"
+            val = (categorie.categoryname)
             self.cnxcursor.execute(query,val)
             self.cnxvar.commit()
 
@@ -37,8 +33,8 @@ class Writemanager:
     
     def writeproduct(self):
         
-        api = Apimanager()
-        apiproducts = api.createproductobject()
+        data = Datacleaner()
+        apiproducts = data.createproductobject()
         self.cnxvar
         self.cnxcursor
         primary = 0

@@ -3,12 +3,12 @@ class Category:
 
     def __init__(self,category):
         """method to create an object of the Category class, takes a single arg as string value."""
-        self.categoryname = str(category)
-        self.primarykey = 0
+        self.categoryname = category
+
 
     def __repr__(self):
         """display Category in console"""
-        return self.categoryname
+        return "Categoryobject"
     
     def __str__(self):
         """display Category object for print method"""
