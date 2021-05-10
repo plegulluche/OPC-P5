@@ -9,13 +9,14 @@ class Dbmanager:
     """class that create the DB and tables inside it """
 
     def __init__(self):
-        self.logintomysql = config.useridnodb
+        self.logintomysqlnodb = config.useridnodb
+        self.logintomysql = config.userid
         self.filetoconstructdb = config.filefordbcreator 
 
     def contructdatabase(self):
 
         try:
-            cnx = mysql.connector.connect(**self.logintomysql)
+            cnx = mysql.connector.connect(**self.logintomysqlnodb)
             
 
         except mysql.connector.Error as err:
@@ -54,7 +55,7 @@ class Dbmanager:
         
         db_builder_cursor = cnx.cursor()
 
-        db_builder_cursor.execute("USE food;")
+        
 
         def exec_sql_file(cursor=db_builder_cursor, file=self.filetoconstructdb):
             

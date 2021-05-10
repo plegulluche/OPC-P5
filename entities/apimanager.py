@@ -46,21 +46,22 @@ class Apimanager:
         """
         eight = self.geteightcategories()
         print('ROG DEBUG: eight', eight)
-        productsdict = {}
+        productsliste = []
         for category in eight:
             print('ROG DEBUG: one category:', category)
-            productsdict[category] = []
+            
             condition = True
             page = 1
             while condition:
                 print("PIER DEBUG: page:", page)        
                 r2 = requests.get("https://fr.openfoodfacts.org/cgi/search.pl?action=process&tagtype_0=categories&tag_contains_0=contains&tag_0={}&tag_contains_1=contains&tag_1=france&page_size=500&fields=url,categories,product_name,stores,nutriscore_grade&tagtype_1=purchase_places&sort_by=unique_scans_n&json=1&page={}".format(category,page)) 
                 dataproducts = r2.json()
+                print('PIERR DEBUG: pagecount:',dataproducts["page_count"])
                 if dataproducts["page_count"] is None:
                     condition = False
                 else:
                     for items in dataproducts["products"]:
-                        productsdict[category].append(items)
+                        productsliste.append(items)
                     page += 1
                     print('PIER DEBUG: Page increm:',page)
 
