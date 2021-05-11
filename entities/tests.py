@@ -17,16 +17,9 @@ def execute():
     Db.contructdatabase()
     Db.builddatabasetables()
 
-    Data = Datacleaner()
-
-    Data.createcategoryobject()   #TODO: a tester en connection. 
-    Data.createproductobject()
-    Data.createshopobjects()
-
-
     Write = Writemanager()
     Write.writecategories()
-    Write.writeproduct()
+    # Write.writeproduct()
     Write.writeshops()
 
 execute()

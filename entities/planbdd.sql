@@ -23,8 +23,8 @@ DROP TABLE IF EXISTS `Category`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `Category` (
-  `categoryID` INT NOT NULL,
-  `categoryName` varchar(250) NOT NULL,
+  `categoryID` INT NOT NULL AUTO_INCREMENT ,
+  `categoryName` varchar(400) NOT NULL,
   PRIMARY KEY (`categoryID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -49,7 +49,7 @@ CREATE TABLE `Product` (
   `productID` int NOT NULL AUTO_INCREMENT,
   `shopID` int DEFAULT NULL,
   `nutriScore` CHAR(1),
-  `productName` varchar(80) NOT NULL,
+  `productName` varchar(200) NOT NULL,
   `linkToURLOFF` varchar(300) NOT NULL,
   PRIMARY KEY (`productID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;

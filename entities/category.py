@@ -8,7 +8,7 @@ class Category:
 
     def __repr__(self):
         """display Category in console"""
-        return "Categoryobject"
+        return f"{self.categoryname}"
     
     def __str__(self):
         """display Category object for print method"""

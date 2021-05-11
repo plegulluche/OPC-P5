@@ -50,33 +50,17 @@ class Apimanager:
         for category in eight:
             print('ROG DEBUG: one category:', category)
             
-            condition = True
-            page = 1
-            while condition:
+            for page in range(1,3,1):
                 print("PIER DEBUG: page:", page)        
                 r2 = requests.get("https://fr.openfoodfacts.org/cgi/search.pl?action=process&tagtype_0=categories&tag_contains_0=contains&tag_0={}&tag_contains_1=contains&tag_1=france&page_size=500&fields=url,categories,product_name,stores,nutriscore_grade&tagtype_1=purchase_places&sort_by=unique_scans_n&json=1&page={}".format(category,page)) 
                 dataproducts = r2.json()
                 print('PIERR DEBUG: pagecount:',dataproducts["page_count"])
                 if dataproducts["page_count"] is None:
-                    condition = False
+                    continue
                 else:
                     for items in dataproducts["products"]:
                         productsliste.append(items)
-                    page += 1
-                    print('PIER DEBUG: Page increm:',page)
 
-        self.rawproductdata = productsdict                      
+        self.rawproductdata = productsliste                     
 
-    def getproductbycategory2(self):
-
-        eight = self.geteightcategories()
-        productsdict = {}
-        for category in eight:               
-            productsdict[category] = []
-            r = requests.get("https://fr.openfoodfacts.org/cgi/search.pl?action=process&tagtype_0=categories&tag_contains_0=contains&tag_0={}&tag_contains_1=contains&tag_1=france&page_size=500&fields=url,categories,product_name,stores,nutriscore_grade&tagtype_1=purchase_places&sort_by=unique_scans_n&json=1&page=1".format(category))
-            dataproducts = r.json()
-            for product in dataproducts["products"]:
-                productsdict[category].append(product)
-
-        self.rawproductdata = productsdict
-
+  
