@@ -12,7 +12,9 @@ class Datacleaner:
 
     def __init__(self):
         self.api = Apimanager()
-
+        self.productslist = self.createproductobject()
+        self.categorylist = self.createcategoryobject()
+        self.shoplist = self.createshopobjects()
         
 
     def extractcategoriesnames(self):
@@ -64,16 +66,14 @@ class Datacleaner:
     def getshopslist(self):
 
         self.api.rawproductdata
-        shoplist = []
-        
-        for products in self.api.rawproductdata:
-            keys = ["stores_tags"]                    
-            values = map(products.get, keys)    
-            for stores in values:
-                if stores is not None:
-                    for store in stores:
-                        if store not in shoplist:
-                            shoplist.append(store)
+        shoplist = []       
+        for products in self.api.rawproductdata:           
+            keys = "stores_tags"                    
+            values = products.get(keys)           
+            if values is not None:
+                for store in values:                   
+                    if store not in shoplist:
+                        shoplist.append(store)
         
         return shoplist           # returns a list of strings
 
