@@ -18,8 +18,9 @@ def execute():
     Db.builddatabasetables()
 
     Write = Writemanager()
+    print("PIERR DEBUG: shoplist:",Write.data.shoplist)
     Write.writecategories()
-    # Write.writeproduct()
     Write.writeshops()
+    Write.writeproduct()
 
 execute()

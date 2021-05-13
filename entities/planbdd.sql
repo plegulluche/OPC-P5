@@ -47,7 +47,6 @@ DROP TABLE IF EXISTS `Product`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `Product` (
   `productID` int NOT NULL AUTO_INCREMENT,
-  `shopID` int DEFAULT NULL,
   `nutriScore` CHAR(1),
   `productName` varchar(200) NOT NULL,
   `linkToURLOFF` varchar(300) NOT NULL,

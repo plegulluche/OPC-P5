@@ -1,5 +1,6 @@
 virtualenv
 dbcreator.py
+tests.py
 
 *.txt
 *.docx
