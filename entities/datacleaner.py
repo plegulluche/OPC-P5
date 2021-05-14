@@ -55,12 +55,12 @@ class Datacleaner:
                             productname = products.get(keys[2]),
                             shop = products.get(keys[4]) 
                             )
-            
-            productlist.append(Product(nutriscore = values["nutriscore"], 
-                                        productname = values["productname"], 
-                                        linktourl = values["linktourl"], 
-                                        categories = values["categories"],
-                                        shop = values["shop"]))
+            if values['productname'] is not None:
+                productlist.append(Product(nutriscore = values["nutriscore"], 
+                                            productname = values["productname"], 
+                                            linktourl = values["linktourl"], 
+                                            categories = values["categories"],
+                                            shop = values["shop"]))
         return productlist
 
     def getshopslist(self):

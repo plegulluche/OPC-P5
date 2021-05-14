@@ -20,7 +20,6 @@ class Writemanager:
         cnxvar = mysql.connector.connect(**config.userid)                      
         catecursor = cnxvar.cursor()
         for categorie in categoryapi:
-            print("PIERR DEBUG: one category:", categorie)
             query = "INSERT INTO Category(categoryName) VALUES (%(name)s)"
             val = (categorie.categoryname)
             catecursor.execute(query,{"name": val})
@@ -28,7 +27,7 @@ class Writemanager:
 
         catecursor.close()   
         cnxvar.close()
-                
+        print("PIERR DEBUG: categories data inserted.")       
     
     def writeproduct(self):
         
@@ -36,7 +35,6 @@ class Writemanager:
         cnxvar = mysql.connector.connect(**config.userid)
         prodcursor = cnxvar.cursor()
         for product in apiproducts:
-            print("PIERR DEBUG: one product:", product)
             query = "INSERT INTO Product(productName, linkToURLOFF, nutriScore) VALUES (%(name)s, %(link)s, %(score)s)"
             val = (product.productname, product.linktourl, product.nutriscore)
             shopid = None
@@ -45,6 +43,7 @@ class Writemanager:
                       
         prodcursor.close()
         cnxvar.close()
+        print("PIERR DEBUG: product data inserted.")
 
     def writeshops(self):
         
@@ -52,7 +51,6 @@ class Writemanager:
         cnxvar = mysql.connector.connect(**config.userid)
         shopcursor = cnxvar.cursor()
         for shop in shops:
-            print("PIERR DEBUG: one shop:", shop)
             query = "INSERT INTO Shops(shopName) VALUES (%(name)s)"
             val = (shop.shopname)
             shopcursor.execute(query, {"name" : val})
@@ -60,10 +58,72 @@ class Writemanager:
         
         shopcursor.close()
         cnxvar.close()
+        print("PIERR DEBUG: shop data inserted.")
 
     def writeproductcategory(self):
-        #get id product associated with category id and insert it into the table
-        pass
+        
+        cnxvar = mysql.connector.connect(**config.userid)
+        prodcatecursor = cnxvar.cursor()
+        
+        for products in self.data.productslist:                  #itering through list of products objects.  
+            prodcate = products.categories
+            for categorie in prodcate:
+                cate = categorie
+                prodname = products.productname
+                queryprod = "SELECT productID FROM Product WHERE productName = %(prodname)s "
+                querycate = "SELECT categoryID FROM Category WHERE categoryName = %(cate)s "
+                prodcatecursor.execute(queryprod, {"prodname" : prodname } )
+                for rows in prodcatecursor.fetchall():
+                    for values in rows:
+                        prodid = values
+                prodcatecursor.execute(querycate, {"cate" : cate})
+                for rows in prodcatecursor.fetchall():
+                    for values in rows:
+                        cateid = values
+                table = "ProductCategory"
+                columnprod = "productID"
+                columncate = "categoryID"
+                queryinsert = f"INSERT IGNORE INTO {table}({columncate},{columnprod}) VALUES ({cateid}, {prodid})"
+                prodcatecursor.execute(queryinsert)
+                cnxvar.commit()
+        
+        prodcatecursor.close()
+        cnxvar.close()
+
+        print("PIERR DEBUG: product category insertion done.")
+
     def writeproductinshop(self):
-        #same as above
-        pass            
+        
+        cnxvar = mysql.connector.connect(**config.userid)
+        prodshopcursor = cnxvar.cursor()
+
+        for products in self.data.productslist:
+            prodshops = products.shop
+            if prodshops is not None:
+                for shops in prodshops:
+                    shop = shops
+                    prodname = products.productname
+                    queryprod = "SELECT productID FROM Product WHERE productNAme = %(prodname)s "
+                    queryshop = "SELECT shopID FROM Shops WHERE shopName = %(shop)s "
+                    prodshopcursor.execute(queryprod, {"prodname" : prodname})
+                    for rows in prodshopcursor.fetchall():
+                        for values in rows:
+                            prodid = values
+                    prodshopcursor.execute(queryshop, {"shop" : shop})
+                    for rows in prodshopcursor.fetchall():
+                        for values in rows:
+                            shopid = values
+                    table = "ProductInShop"
+                    columnprod = "productID"
+                    columnshop = "shopID"
+                    queryinsert = f"INSERT IGNORE INTO {table}({columnprod},{columnshop}) VALUES ({prodid}, {shopid})"
+                    prodshopcursor.execute(queryinsert)
+                    cnxvar.commit()
+
+        prodshopcursor.close()
+        cnxvar.close()
+
+        print("PIERR DEBUG: product shop insertion done.")
+
+
+                

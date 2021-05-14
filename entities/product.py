@@ -5,7 +5,7 @@ class Product:
         """Product class construtor, can take *arg """
 
         self.nutriscore = nutriscore
-        self.productname = str(productname)
+        self.productname = productname
         self.linktourl = linktourl
         self.categories = categories
         self.shop = shop
