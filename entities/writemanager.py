@@ -67,6 +67,7 @@ class Writemanager:
         
         for products in self.data.productslist:                  #itering through list of products objects.  
             prodcate = products.categories
+            print("PIERR DEBUG: one product", products)
             for categorie in prodcate:
                 cate = categorie
                 prodname = products.productname
@@ -99,6 +100,7 @@ class Writemanager:
 
         for products in self.data.productslist:
             prodshops = products.shop
+            print("PIERR DEBUG: one product shop:", products)
             if prodshops is not None:
                 for shops in prodshops:
                     shop = shops
