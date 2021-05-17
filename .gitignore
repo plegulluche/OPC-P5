@@ -1,12 +1,14 @@
 virtualenv
 dbcreator.py
-tests.py
+entities/tests.py
+entities/productcategory.py
+entities/productinshop.py
 
 *.txt
 *.docx
 *.drawio
 *.xlsx
-
+*.json
 
 Onsaisjamais
 
