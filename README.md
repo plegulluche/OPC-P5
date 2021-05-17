@@ -5,12 +5,14 @@
 ## Installation
 
 pip install mysql-connector-python
+pip install requests
+
 The solution is to install corresponding Python 3 module:
 
 sudo apt-get install python3-mysql.connector
 
-It fixes import mysql.connector error:
-pip install requests
+It fixes import mysql.connector error.
+
 
 ## Usage
 
