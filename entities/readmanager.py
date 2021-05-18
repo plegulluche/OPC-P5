@@ -1,4 +1,3 @@
-from os import link
 import mysql.connector
 
 import config
@@ -8,23 +7,23 @@ class Readmanager():
     def __init__(self):
         pass
 
-    def readcategory(self,value):
-        '''Takes one parameter.
-           Returns
-        '''   
+    def readcategory(self,value):                  #OK 
+        
         cnxvar = mysql.connector.connect(**config.userid)
         readcatecursor = cnxvar.cursor()
+
         retour = None
 
         if isinstance(value, int):
-            query = "SELECT categoryName FROM Category WHERE categoryID = %(cateid)s"
+            query = "SELECT categoryName FROM Category WHERE categoryID = %(cateid)s "
             readcatecursor.execute(query, {"cateid" : value})
             for rows in readcatecursor.fetchall():
-                for values in rows:
+                for values in rows:   
                     retour = values
 
+
         if isinstance(value, str):
-            query = "SELECT categoryID FROM Category WHERE categoryName = %(name)s"
+            query = "SELECT categoryID FROM Category WHERE categoryName = %(name)s "
             readcatecursor.execute(query, {"name" : value})
             for rows in readcatecursor.fetchall():
                 for values in rows:
@@ -33,9 +32,10 @@ class Readmanager():
 
         readcatecursor.close()
         cnxvar.close()
+
         return retour
 
-    def readproductnameorid(self,id=0,name=0):
+    def readproductnameorid(self,value):
         """
         *args = [id] , [name].
         """
@@ -43,46 +43,48 @@ class Readmanager():
         prodcursor = cnxvar.cursor()
         retour = 0
             
-        valueid = id   #this block takes a number and fetch prod name by id
-        if valueid != 0 and name ==0:
+         
+        if isinstance(value, int):
             query = "SELECT productName FROM Product WHERE productID = %(prodid)s "
-            prodcursor.execute(query, {"prodid" : valueid})
+            prodcursor.execute(query, {"prodid" : value})
             for rows in prodcursor.fetchall():
+                print(rows)
                 for values in rows:
                     retour = values
         
-        valuename = name  #this block takes a string value and fetch prod id by name
-        if valuename != 0 and id == 0:
+        
+        if isinstance(value, str):
             query = "SELECT productID FROM Product WHERE productName = %(prodname)s "
-            prodcursor.execute(query, {"prodname" : valuename})
+            prodcursor.execute(query, {"prodname" : value})
             for rows in prodcursor.fetchall():
+                print(rows)
                 for values in rows:
                     retour = values
 
         prodcursor.close()
         cnxvar.close()
+
         return retour
 
     def selectproductdata(self,idprod):
         """
-        param in that order: prodid = "productID"
-                             nutri = "nutriScore"
-                             name = "productName"
-                             link = "linkToURLOFF"
-        cas d'utilisation : -affichage des données du produit
-        besoins : link , nutriscore, nom.
+
+        Takes one param : INT (productID)
+        Return : Tuple containing values as strings
+
         """
         cnxvar = mysql.connector.connect(**config.userid)
         selectcursor = cnxvar.cursor()
         
         query = "SELECT productName, nutriScore, linkToURLOFF from Product WHERE productID = %(prodid)s  "
         selectcursor.execute(query, { "prodid" : idprod})
-        for rows in selectcursor.fetchall():
-            print(rows)
-            for values in rows:
-                print(values)
+        for rows in selectcursor.fetchall():   # return a tuple containing string values. 
+            values = rows
 
-        
+        selectcursor.close()
+        cnxvar.close()
+
+        return values
 
     def readshops(self,value):
 
@@ -106,11 +108,27 @@ class Readmanager():
         
         shopcursor.close()
         cnxvar.close()
+
         return retour
         
     def readproductcate(self):
+        """productid = from product.productID
+           categoryid = from category.categoryID
+            
+
+        """
+        #faire un select de l'union ou jointure entre l id de la table prodcut cate et les tables product et category 
+        #une methode si on a l'id de la cate et on veut les produits correspondants. 
+        #une methode si on a l'id du produit et on veut les cate correpondantes.
         pass
+
     def readproductshop(self):
+        #comme au dessus mais pour product et shop.
         pass
+
     def readsurrogate(self):
+        
+        #une methode qui va lire toutes les entrees de table et les afficher.
         pass
+
+    

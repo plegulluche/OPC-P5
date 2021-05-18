@@ -1,5 +1,6 @@
-import json
+import mysql.connector
 
+import config
 from apimanager import Apimanager
 from product import Product
 from shops import Shops
@@ -11,7 +12,18 @@ class Datacleaner:
 
 
     def __init__(self):
-        self.api = Apimanager()
+
+        self.api = 0
+        cnxvar = mysql.connector.connect(**config.userid)
+        dbcursor = cnxvar.cursor()
+        query = "SELECT * FROM Shops"
+        dbcursor.execute(query)
+        print(dbcursor.fetchall())
+        if dbcursor.fetchall() == []:
+            dbcursor.close()
+            cnxvar.close()
+            self.api = Apimanager()
+        
         self.productslist = self.createproductobject()
         self.categorylist = self.createcategoryobject()
         self.shoplist = self.createshopobjects()

@@ -65,9 +65,8 @@ class Writemanager:
         cnxvar = mysql.connector.connect(**config.userid)
         prodcatecursor = cnxvar.cursor()
         
-        for products in self.data.productslist:                  #itering through list of products objects.  
+        for products in self.data.productslist:
             prodcate = products.categories
-            print("PIERR DEBUG: one product", products)
             for categorie in prodcate:
                 cate = categorie
                 prodname = products.productname
@@ -100,7 +99,6 @@ class Writemanager:
 
         for products in self.data.productslist:
             prodshops = products.shop
-            print("PIERR DEBUG: one product shop:", products)
             if prodshops is not None:
                 for shops in prodshops:
                     shop = shops
@@ -127,5 +125,39 @@ class Writemanager:
 
         print("PIERR DEBUG: product shop insertion done.")
 
+    def cleantables(self):
 
-                
+        cnxvar = mysql.connector.connect(**config.userid)
+        doublescursor = cnxvar.cursor()
+
+        queryproduct = "SELECT productName, COUNT(productName) FROM Product GROUP BY productName HAVING COUNT(productName) > 1"
+        doublescursor.execute(queryproduct)
+        for rows in doublescursor.fetchall():
+            checkprod = rows
+        if checkprod != 0:
+            querycleanprod = "DELETE t1 FROM Product t1 INNER JOIN Product t2 WHERE t1.productID < t2.productID AND t1.productName = t2.productName"
+            doublescursor.execute(querycleanprod)
+            cnxvar.commit()
+
+        querycategory = "SELECT categoryName, COUNT(categoryName) FROM Category GROUP BY categoryName HAVING COUNT(categoryName) > 1"
+        doublescursor.execute(querycategory)
+        for rows in doublescursor.fetchall():
+            checkcate = rows
+        if checkcate != 0:
+            querycleancate = "DELETE t1 FROM Category t1 INNER JOIN Category t2 WHERE t1.categoryID < t2.categoryID AND t1.categoryName = t2.categoryName"
+            doublescursor.execute(querycleancate)
+            cnxvar.commit()
+
+        queryshops = "SELECT shopName, COUNT(shopName) FROM Shops GROUP BY shopName HAVING COUNT(shopName) > 1"
+        doublescursor.execute(queryshops)
+        for rows in doublescursor.fetchall():
+            checkshop = rows
+        if checkshop != 0:
+            querycleanshop = "DELETE t1 FROM Shops t1 INNER JOIN Shops t2 WHERE t1.shopID < t2.shopID AND t1.shopName = t2.shopName "
+            doublescursor.execute(querycleanshop)
+            cnxvar.commit()
+
+        doublescursor.close()
+        cnxvar.close()             
+
+        print("Tables Cleaned. No doubles left.")

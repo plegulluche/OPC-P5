@@ -1,8 +1,7 @@
-from tkinter import *
 
 
 import mysql.connector
-from mysql.connector import errorcode
+from mysql.connector import errorcode as er
 
 class Interface:
 
