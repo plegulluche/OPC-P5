@@ -37,7 +37,6 @@ class Writemanager:
         for product in apiproducts:
             query = "INSERT INTO Product(productName, linkToURLOFF, nutriScore) VALUES (%(name)s, %(link)s, %(score)s)"
             val = (product.productname, product.linktourl, product.nutriscore)
-            shopid = None
             prodcursor.execute(query,{"name" : val[0], "link" : val[1], "score" : val[2]})
             cnxvar.commit()
                       
@@ -124,6 +123,13 @@ class Writemanager:
         cnxvar.close()
 
         print("PIERR DEBUG: product shop insertion done.")
+
+    def writesurrogate(self,value,value2):
+
+        cnxvar = mysql.connector.connect(**config.userid)
+        writecursor = cnxvar.cursor()
+
+        query = "INSERT INTO etc... a finir"
 
     def cleantables(self):
 

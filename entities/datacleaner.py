@@ -18,7 +18,6 @@ class Datacleaner:
         dbcursor = cnxvar.cursor()
         query = "SELECT * FROM Shops"
         dbcursor.execute(query)
-        print(dbcursor.fetchall())
         if dbcursor.fetchall() == []:
             dbcursor.close()
             cnxvar.close()

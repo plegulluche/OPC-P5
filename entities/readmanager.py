@@ -35,10 +35,8 @@ class Readmanager():
 
         return retour
 
-    def readproductnameorid(self,value):
-        """
-        *args = [id] , [name].
-        """
+    def readproductnameorid(self,value):        #OK
+        
         cnxvar = mysql.connector.connect(**config.userid)
         prodcursor = cnxvar.cursor()
         retour = 0
@@ -48,7 +46,6 @@ class Readmanager():
             query = "SELECT productName FROM Product WHERE productID = %(prodid)s "
             prodcursor.execute(query, {"prodid" : value})
             for rows in prodcursor.fetchall():
-                print(rows)
                 for values in rows:
                     retour = values
         
@@ -57,7 +54,6 @@ class Readmanager():
             query = "SELECT productID FROM Product WHERE productName = %(prodname)s "
             prodcursor.execute(query, {"prodname" : value})
             for rows in prodcursor.fetchall():
-                print(rows)
                 for values in rows:
                     retour = values
 
@@ -66,7 +62,7 @@ class Readmanager():
 
         return retour
 
-    def selectproductdata(self,idprod):
+    def selectproductdata(self,idprod):           #OK
         """
 
         Takes one param : INT (productID)
@@ -86,7 +82,7 @@ class Readmanager():
 
         return values
 
-    def readshops(self,value):
+    def readshops(self,value):          #OK
 
         cnxvar = mysql.connector.connect(**config.userid)
         shopcursor = cnxvar.cursor()
@@ -111,24 +107,119 @@ class Readmanager():
 
         return retour
         
-    def readproductcate(self):
-        """productid = from product.productID
-           categoryid = from category.categoryID
-            
-
-        """
-        #faire un select de l'union ou jointure entre l id de la table prodcut cate et les tables product et category 
-        #une methode si on a l'id de la cate et on veut les produits correspondants. 
-        #une methode si on a l'id du produit et on veut les cate correpondantes.
-        pass
-
-    def readproductshop(self):
-        #comme au dessus mais pour product et shop.
-        pass
-
-    def readsurrogate(self):
+    def readproductcateprod(self,value):         #OK
         
-        #une methode qui va lire toutes les entrees de table et les afficher.
-        pass
+        cnxvar = mysql.connector.connect(**config.userid)    
+        readcursor = cnxvar.cursor()
+        retourids = []
 
-    
+        queryname = "SELECT categoryName FROM Category INNER JOIN ProductCategory ON Category.categoryID = ProductCategory.categoryID WHERE ProductCategory.productID = %(prodid)s "
+        readcursor.execute(queryname, { "prodid" : value })
+        for rows in readcursor.fetchall():
+            for values in rows:
+                retourids.append(values)
+
+        readcursor.close()
+        cnxvar.close()
+
+        return retourids
+                
+    def readproductcatecate(self,value):             #OK
+
+        cnxvar = mysql.connector.connect(**config.userid)    
+        readcursor = cnxvar.cursor()
+        retourids = []
+
+
+        queryid = "SELECT productName FROM Product INNER JOIN ProductCategory ON Product.productID = ProductCategory.productID WHERE ProductCategory.categoryID = %(cateid)s "
+        readcursor.execute(queryid, { "cateid" : value })
+        for rows in readcursor.fetchall():
+            for values in rows:
+                retourids.append(values)
+
+        readcursor.close()
+        cnxvar.close()
+
+        return retourids
+
+    def readproductshopshop(self,value):    #OK
+        
+        cnxvar = mysql.connector.connect(**config.userid)    
+        readcursor = cnxvar.cursor()
+        retourids = []
+
+        
+        queryid = "SELECT shopName FROM Shops INNER JOIN ProductInShop ON Shops.shopID = ProductInShop.shopID WHERE ProductInShop.productID = %(prodid)s "
+        readcursor.execute(queryid, { "prodid" : value })
+        for rows in readcursor.fetchall():
+            for values in rows:
+                retourids.append(values)
+        
+        readcursor.close()
+        cnxvar.close()
+
+        return retourids
+
+    def readproductshopproducts(self,value):    #OK
+
+        cnxvar = mysql.connector.connect(**config.userid)    
+        readcursor = cnxvar.cursor()
+        retourids = []
+
+        
+        queryid = "SELECT productName FROM Product INNER JOIN ProductInShop ON Product.productID = ProductInShop.productID WHERE ProductInShop.shopID = %(shopid)s "
+        readcursor.execute(queryid, { "shopid" : value })
+        for rows in readcursor.fetchall():
+            for values in rows:
+                retourids.append(values)
+
+        readcursor.close()
+        cnxvar.close()
+
+        return retourids
+
+
+    def readsurrogate(self):     # a check et finir voir les retour du fetchall quand elements dans la table.
+        
+        cnxvar = mysql.connector.connect(**config.userid)    
+        readcursor = cnxvar.cursor()
+        retourids = []
+
+        query = "SELECT * FROM Surrogate INNER JOIN Product ON Product.productID = Surrogate.productID AND Product.productID = Surrogate.surrogateID "
+        readcursor.execute(query)
+        for rows in readcursor.fetchall():
+            for values in rows:
+                retour = values
+
+    def read5randomcate(self):           #OK
+      
+        cnxvar = mysql.connector.connect(**config.userid)
+        prodcursor = cnxvar.cursor()
+        retour = []
+
+        query = "SELECT categoryID FROM ProductCategory WHERE RAND() > 0.9 ORDER BY RAND() LIMIT 5"
+        prodcursor.execute(query)
+        for rows in prodcursor.fetchall():
+            for values in rows:
+                retour.append(values)
+
+        prodcursor.close()
+        cnxvar.close()
+
+        return retour
+
+    def read5randomproduct(self,category):
+
+        cnxvar = mysql.connector.connect(**config.userid)
+        prodcursor = cnxvar.cursor()
+        retour = []
+        query = "SELECT productID FROM ProductCategory WHERE RAND() > 0.9 AND categoryID = %(cateid)s LIMIT 5"
+        prodcursor.execute(query, { "cateid" : category })
+        for rows in prodcursor.fetchall():
+            for values in rows:
+                retour.append(values)
+        
+        prodcursor.close()
+        cnxvar.close()
+
+        return retour
