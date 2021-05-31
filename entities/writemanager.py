@@ -124,12 +124,17 @@ class Writemanager:
 
         print("PIERR DEBUG: product shop insertion done.")
 
-    def writesurrogate(self,value,value2):
+    def writesurrogate(self,productid,surrogateid):
 
         cnxvar = mysql.connector.connect(**config.userid)
         writecursor = cnxvar.cursor()
 
-        query = "INSERT INTO etc... a finir"
+        query = "INSERT INTO Surrogate (productID,surrogateID) VALUES (%(prodid)s,%(surroid)s) "
+        writecursor.execute(query, { "prodid" : productid, "surroid" : surrogateid })
+        cnxvar.commit()
+
+        writecursor.close()
+        cnxvar.close()
 
     def cleantables(self):
 

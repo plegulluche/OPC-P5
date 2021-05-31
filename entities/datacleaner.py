@@ -22,10 +22,10 @@ class Datacleaner:
             dbcursor.close()
             cnxvar.close()
             self.api = Apimanager()
-        
-        self.productslist = self.createproductobject()
-        self.categorylist = self.createcategoryobject()
-        self.shoplist = self.createshopobjects()
+            self.productslist = self.createproductobject()
+            self.categorylist = self.createcategoryobject()
+            self.shoplist = self.createshopobjects()
+            
         
 
     def extractcategoriesnames(self):

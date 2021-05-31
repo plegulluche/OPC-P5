@@ -1,5 +1,7 @@
+from re import sub
 import mysql.connector
 from mysql.connector import errorcode as er
+from tqdm import tqdm
 
 import config
 from readmanager import Readmanager
@@ -116,18 +118,27 @@ class Interface:
             self.chooseproduct(id)
         
         
-    def chooseproduct(self,idcate):
-        
+    def chooseproduct(self,idcate):        #OK
+
         read = Readmanager()
-        fiveproducts = read.read5randomproduct(idcate)
-        listprod = []
-        for prodid in fiveproducts:
-            prodname = read.readproductnameorid(prodid)
-            listprod.append(prodname)
-        x = 1
-        for prodname in listprod:
-            print(x, ":", prodname)
-            x += 1
+        checkmorethanfive = read.readproductcatecate(idcate)
+        fiveproducts = None
+        if len(checkmorethanfive) <= 5:
+            fiveproducts = read.readproductcatecate(idcate)
+            x = 1
+            for product in fiveproducts:
+                print(x, ":", product)
+                x += 1
+        else:
+            fiveproducts = read.read5randomproduct(idcate)
+            listprod = []
+            for prodid in fiveproducts:
+                prodname = read.readproductnameorid(prodid)
+                listprod.append(prodname)
+            x = 1
+            for prodname in listprod:
+                print(x, ":", prodname)
+                x += 1
         
 
         cond = True
@@ -142,69 +153,206 @@ class Interface:
                 print("Veuillez entrer un choix valide (1-5)")
 
         if userinput == 1:
-            print("algo avec l'idprod1")
+            self.algosubstitu(fiveproducts[0])
         elif userinput == 2:
-            print("algo prodid 2")
+            self.algosubstitu(fiveproducts[1])
         elif userinput == 3:
-            print("algo proid 3")
+            self.algosubstitu(fiveproducts[2])
         elif userinput == 4:
-            print("algo proid 4")
+            self.algosubstitu(fiveproducts[3])
         else:
-            print("algo prodid 5")
-        
-        #algo de substitution en fonction du produit choisi
-        #surrogate(mettre l'id du produit choisi)
-    def surrogate(self,value):
-           #a partir du produit trouver le produit qui a le plus de categories en commun et un meilleur nutriscore.
-           #si produit trouvé l'afficher sinon afficher pas d'alternative.
-        pass
-
-        #voulez vous enregistrer le produit?
-        
-        # cond = True
-        # while cond:
-        #     try:
-        #         userinput = input("Voulez vous enregistrer le resultat de la recherche ? (O/N")
-        #         if len(userinput) == 1 and isinstance(userinput, str):
-        #             cond = False
-        #         else:
-        #             raise ValueError
-        #     except ValueError:
-        #         print("Veuillez entrer une reponse valide (O/N) ")
-
-        # if userinput.lower() == "y":
-        #     #methode pour enregistrer le produit dans la table surrogate.
+            self.algosubstitu(fiveproducts[4])
     
-        # #checher un nouveau produit ou retour au menu ?
-        # sousmenu = {
-        #             1 : "chercher un nouveau produit",
-        #             2 : "Retour au menu"
-        # }
-        # for key, values in sousmenu.items():
-        #     print(key, ":" , values)
+    def algosubstitu(self,productid):   #OK
 
-        # cond = True
-        # while cond:
-        #     try:
-        #         userinput = int(input("Veuillez entrer votre choix : (1-2) "))
-        #         if len(userinput) == 1 and isinstance(userinput, int):
-        #             cond = False
-        #         else:
-        #             raise ValueError
-        #     except ValueError:
-        #         print("Veuillez entrer un choix valide (1-2")
+        print("RECHERCHE DE VOTRE SUBSTITUT VEUILLEZ PATIENTER.")
+        read = Readmanager()
+ 
+        listcatename = read.readproductcateprod(productid)
 
-        # if userinput == 1:
-        #     newproduct()
-        # else:
-        #     menuprompt()
+        listcateids = []
+        for cate in listcatename:
+            listcateids.append(read.readcategory(cate))
+
+        prospectprodid = []
+        if read.readsamecate(listcateids) != []:
+            prospectprodid.append(read.readsamecate(listcateids))
+
+        prospectprodid = prospectprodid[0]     
+        while productid in prospectprodid:
+            del prospectprodid[prospectprodid.index(productid)]
+
+        listofproductwithcategories = []        
+        for product in tqdm(prospectprodid):
+            catesprodname = read.readproductcatecateid(product)
+            datas = (product,catesprodname)
+            listofproductwithcategories.append(datas)
+
+        finalprospects = []
+        
+        for productandcates in tqdm(listofproductwithcategories):
+            commons = list(set(productandcates[1]).intersection(listcateids))
+            score = len(commons)
+            if score == len(listcateids):
+                finalprospects.append(productandcates[0])
+            elif score == len(listcateids) - 1:
+                finalprospects.append(productandcates[0])
+        
+        
             
+        scoreref = 0
+        scoresubstitute = 0
+        substituteid = 0
+        nutriscoreref = read.readnutriscore(productid)
+        if nutriscoreref == "a":
+            scoreref = 1
+        elif nutriscoreref == "b":
+            scoreref = 2
+        elif nutriscoreref == "c":
+            scoreref = 3
+        elif nutriscoreref == "d":
+            scoreref = 4
+        else:
+            scoreref = 5
+        for prodid in finalprospects:
+            if read.readnutriscore(prodid) == "a":
+                scoresubstitute = 1
+            elif  read.readnutriscore(prodid) == "b":
+                scoresubstitute = 2
+            elif read.readnutriscore(prodid) == "c":
+                scoresubstitute = 3
+            elif read.readnutriscore(prodid) == "d":
+                scoresubstitute = 4
+            elif read.readnutriscore(prodid) == "e":
+                scoresubstitute = 5
+            else:
+                scoresubstitute = 6
+            if scoresubstitute < scoreref:
+                substituteid = prodid
+                break
+        write = Writemanager()
+        baseproductinfos = read.selectproductdata(productid)  
+        surrogateinfos = read.selectproductdata(substituteid)   
+        surrogateshops = read.readproductshopshop(substituteid) 
+        for items in surrogateinfos:
+            if items == None:
+                items = "Pas d'infos"
+        for items in surrogateshops:
+            if items == None:
+                items = "Pas d'infos"
+
+        print(
+            "                                                          \n"
+            "__________________________________________________________\n"
+            f"Produit de base :        | {baseproductinfos[0]}         \n"
+            f"Nutriscore :             | {baseproductinfos[1]}         \n"
+            f"Substitut :              | {surrogateinfos[0]}           \n"
+            f"Nutriscore :             | {surrogateinfos[1]}           \n"
+            f"Magasins :               | {surrogateshops}              \n"
+            f"URL :                    | {surrogateinfos[2]}           \n"
+            "__________________________________________________________\n" 
+            
+        )
+
+        cond = True
+        while cond:
+            try:
+                userinput = input("Voulez-vous sauvegarder ce substitut ? (o/n) : ")
+                if userinput.lower() == "o":
+                    write.writesurrogate(productid,substituteid)
+                    cond = False
+                    print("Produit enregistré.")
+                elif userinput.lower() == "n":
+                    cond = False
+                    self.menuprompt()
+                else:
+                    raise TypeError
+            except TypeError:
+                print("Veuillez entrer une réponse valide svp (o/n) ")
+        
+        cond = True
+        while cond:
+            try:
+                userinput = input("Voulez vous chercher un autre produit (P) ou retourner au menu principal (M) ? : ")
+                if userinput.lower() == "p":
+                    self.newproduct()
+                    cond = False
+                elif userinput.lower() == "m":
+                    self.menuprompt()
+                    cond = False
+                else:
+                    raise TypeError
+            except TypeError:
+                print("Veuillez entrer un choix valide svp")
+
+
             
     def favorites(self):
-        print("your are inside favorites menu")
-        #display an array of the surrogate table.
+        
+        read = Readmanager()
+        surrogates = read.readsurrogate()
+        allproduct = [] #list of tuple
+        allsurrogates = [] #list of tuples
+        allprodshops = []
+        allsurrshops = []
+        for couples in surrogates:
+            dataproduct = read.selectproductdata(couples[0])
+            datasurrogate = read.selectproductdata(couples[1])
+            allproduct.append(dataproduct)
+            allsurrogates.append(datasurrogate)
+        for couples in surrogates:
+            shopsproducts = read.readproductshopshop(couples[0])
+            shopssurro = read.readproductshopshop(couples[1])
+            allprodshops.append(shopsproducts)
+            allsurrshops.append(shopssurro)
+        listlinksprod = []
+        listlinksurr = []
+        listshopprod = []
+        listshopsurr = []
+        namesprod = []
+        namesurro = []
+
+        for items in allsurrogates:  
+            reslinks = max(items, key = len)
+            listlinksurr.append(reslinks)
+            namesurro.append(items[0])
+        for items in allproduct:
+            reslinks = max(items, key = len)
+            listlinksprod.append(reslinks)
+            namesprod.append(items[0])
+        for items in allprodshops:
+            listshopprod.append(items)
+        for items in allsurrshops:
+            listshopsurr.append(items)
+
+        maxlenlinkprod = len(max(listlinksprod, key = len))
+        maxlenlinksurr = len(max(listlinksurr, key = len))
+        maxlennamesprod = len(max(namesprod, key = len))
+        maxlennamessurr = len(max(namesurro, key = len))
+        maxlenlistshop = 0
+        def totallen(liste):
+            total = 0
+            for shops in liste:
+                total += len(shops)
+
+            return total
+
+        for shopslist in listshopsurr:
+            if totallen(shopslist) > maxlenlistshop:
+                maxlenlistshop = totallen(shopslist)
+        
+        totallenprod = (maxlenlinkprod + maxlennamesprod + 3 + 6)
+        totallensurr = (maxlenlinksurr + maxlennamessurr + maxlenlistshop + 3 + 6)
+
+        top = print("|","_" * 25,"Produit de Base","_" * 25,"|","_" * 25, "Substitut", "_" * 25,"|" )
+        sep = print("*" * 135)
+        name = print(f"Nom: {allproduct[indexprod1][indexprod2]}                                           Nom: {allsurrogates[indexsurr1][indexsurr2]}")
+        nutri = print(f"")
+        shops = print()
+        link = print()        
+             
     
-    def updatedb(self):      #revoir la mise en cache et l emplacement de la verif de condition dans les methodes de remplissage de la bd.
+    def updatedb(self):      #OK
         
         cond = True
         while cond:

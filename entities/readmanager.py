@@ -71,33 +71,34 @@ class Readmanager():
         """
         cnxvar = mysql.connector.connect(**config.userid)
         selectcursor = cnxvar.cursor()
+        retour = None
         
         query = "SELECT productName, nutriScore, linkToURLOFF from Product WHERE productID = %(prodid)s  "
         selectcursor.execute(query, { "prodid" : idprod})
         for rows in selectcursor.fetchall():   # return a tuple containing string values. 
-            values = rows
+            retour = rows
 
         selectcursor.close()
         cnxvar.close()
 
-        return values
+        return retour
 
-    def readshops(self,value):          #OK
+    def readshops(self,shopidorname):          #OK
 
         cnxvar = mysql.connector.connect(**config.userid)
         shopcursor = cnxvar.cursor()
         retour = None
 
-        if isinstance(value, int):
+        if isinstance(shopidorname, int):
             query = "SELECT shopName FROM Shops WHERE shopID = %(shopid)s "
-            shopcursor.execute(query, {"shopid" : value})
+            shopcursor.execute(query, {"shopid" : shopidorname })
             for rows in shopcursor.fetchall():
                 for values in rows:
                     retour = values
         
-        if isinstance(value, str):
+        if isinstance(shopidorname, str):
             query = "SELECT shopID FROM Shops WHERE shopName = %(shopname)s "
-            shopcursor.execute(query, {"shopname" : value})
+            shopcursor.execute(query, {"shopname" : shopidorname})
             for rows in shopcursor.fetchall():
                 for values in rows:
                     retour = values
@@ -107,14 +108,14 @@ class Readmanager():
 
         return retour
         
-    def readproductcateprod(self,value):         #OK
+    def readproductcateprod(self,productid):         #OK
         
         cnxvar = mysql.connector.connect(**config.userid)    
         readcursor = cnxvar.cursor()
         retourids = []
 
         queryname = "SELECT categoryName FROM Category INNER JOIN ProductCategory ON Category.categoryID = ProductCategory.categoryID WHERE ProductCategory.productID = %(prodid)s "
-        readcursor.execute(queryname, { "prodid" : value })
+        readcursor.execute(queryname, { "prodid" : productid })
         for rows in readcursor.fetchall():
             for values in rows:
                 retourids.append(values)
@@ -123,8 +124,24 @@ class Readmanager():
         cnxvar.close()
 
         return retourids
-                
-    def readproductcatecate(self,value):             #OK
+
+    def readproductcatecateid(seld,productid):
+        cnxvar = mysql.connector.connect(**config.userid)    
+        readcursor = cnxvar.cursor()
+        retourids = [] 
+
+        query = "SELECT categoryID FROM ProductCategory WHERE productID = %(prodid)s "
+        readcursor.execute(query, { "prodid" : productid })
+        for rows in readcursor.fetchall():
+            for values in rows:
+                retourids.append(values)
+
+        readcursor.close()
+        cnxvar.close()
+
+        return retourids
+               
+    def readproductcatecate(self,categoryid):             #OK
 
         cnxvar = mysql.connector.connect(**config.userid)    
         readcursor = cnxvar.cursor()
@@ -132,7 +149,7 @@ class Readmanager():
 
 
         queryid = "SELECT productName FROM Product INNER JOIN ProductCategory ON Product.productID = ProductCategory.productID WHERE ProductCategory.categoryID = %(cateid)s "
-        readcursor.execute(queryid, { "cateid" : value })
+        readcursor.execute(queryid, { "cateid" : categoryid })
         for rows in readcursor.fetchall():
             for values in rows:
                 retourids.append(values)
@@ -142,7 +159,7 @@ class Readmanager():
 
         return retourids
 
-    def readproductshopshop(self,value):    #OK
+    def readproductshopshop(self,productid):    #OK
         
         cnxvar = mysql.connector.connect(**config.userid)    
         readcursor = cnxvar.cursor()
@@ -150,7 +167,7 @@ class Readmanager():
 
         
         queryid = "SELECT shopName FROM Shops INNER JOIN ProductInShop ON Shops.shopID = ProductInShop.shopID WHERE ProductInShop.productID = %(prodid)s "
-        readcursor.execute(queryid, { "prodid" : value })
+        readcursor.execute(queryid, { "prodid" : productid })
         for rows in readcursor.fetchall():
             for values in rows:
                 retourids.append(values)
@@ -160,7 +177,7 @@ class Readmanager():
 
         return retourids
 
-    def readproductshopproducts(self,value):    #OK
+    def readproductshopproducts(self,shopid):    #OK
 
         cnxvar = mysql.connector.connect(**config.userid)    
         readcursor = cnxvar.cursor()
@@ -168,7 +185,7 @@ class Readmanager():
 
         
         queryid = "SELECT productName FROM Product INNER JOIN ProductInShop ON Product.productID = ProductInShop.productID WHERE ProductInShop.shopID = %(shopid)s "
-        readcursor.execute(queryid, { "shopid" : value })
+        readcursor.execute(queryid, { "shopid" : shopid })
         for rows in readcursor.fetchall():
             for values in rows:
                 retourids.append(values)
@@ -179,17 +196,21 @@ class Readmanager():
         return retourids
 
 
-    def readsurrogate(self):     # a check et finir voir les retour du fetchall quand elements dans la table.
+    def readsurrogate(self):     #OK
         
         cnxvar = mysql.connector.connect(**config.userid)    
         readcursor = cnxvar.cursor()
-        retourids = []
+        retour = []
 
-        query = "SELECT * FROM Surrogate INNER JOIN Product ON Product.productID = Surrogate.productID AND Product.productID = Surrogate.surrogateID "
+        query = "SELECT productID, surrogateID FROM Surrogate "
         readcursor.execute(query)
         for rows in readcursor.fetchall():
-            for values in rows:
-                retour = values
+            retour.append(rows)
+        
+        readcursor.close()
+        cnxvar.close()
+
+        return retour
 
     def read5randomcate(self):           #OK
       
@@ -223,3 +244,41 @@ class Readmanager():
         cnxvar.close()
 
         return retour
+
+    def readsamecate(self,valuelist):
+
+        cnxvar = mysql.connector.connect(**config.userid)
+        readcursor = cnxvar.cursor()
+        retour = []
+        query = "SELECT productID FROM ProductCategory WHERE categoryID = %(cateid0)s "
+        for iter in range(1,len(valuelist)):
+            query = query + f" UNION SELECT productID FROM ProductCategory WHERE categoryID = %(cateid{iter})s"
+        dicovaluesquery = {}
+        for iters in range(len(valuelist)):
+            dicovaluesquery[f"cateid{iters}"] = valuelist[iters]
+        readcursor.execute(query, dicovaluesquery)
+        for rows in readcursor.fetchall():
+            for values in rows:
+                retour.append(values)
+        
+        readcursor.close()
+        cnxvar.close()
+
+        return retour
+
+    def readnutriscore(self,productid):
+
+        cnxvar = mysql.connector.connect(**config.userid)
+        readcursor = cnxvar.cursor()
+        retour = None
+        query = "SELECT nutriScore FROM Product WHERE productID = %(prodid)s "
+        readcursor.execute(query, { "prodid" : productid })
+        for rows in readcursor.fetchall():
+            for values in rows:
+                retour = str(values)
+
+        readcursor.close()
+        cnxvar.close()
+
+        return retour
+
