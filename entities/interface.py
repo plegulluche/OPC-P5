@@ -30,14 +30,20 @@ class Interface:
         print()
         print()
 
-        userinput = input()
+        
         cond = True
-
         while cond:
-            if userinput == "":
-                cond = False
+            try:
+                userinput = input("")
+                if userinput == "":
+                    cond = False
+                    self.menuprompt()
+                else:
+                    raise ValueError
+            except ValueError:
+                print("Appuyez sur la touche entrée de votre clavier svp")
             
-        self.menuprompt()
+        
                 
             
 
@@ -189,6 +195,7 @@ class Interface:
             listofproductwithcategories.append(datas)
 
         finalprospects = []
+        alternateprospects = []
         
         for productandcates in tqdm(listofproductwithcategories):
             commons = list(set(productandcates[1]).intersection(listcateids))
@@ -197,6 +204,10 @@ class Interface:
                 finalprospects.append(productandcates[0])
             elif score == len(listcateids) - 1:
                 finalprospects.append(productandcates[0])
+            elif score == len(listcateids) - 2:
+                finalprospects.append(productandcates[0])
+            elif score == len(listcateids) - 3:
+                alternateprospects.append(productandcates[0])
         
         
             
@@ -214,6 +225,7 @@ class Interface:
             scoreref = 4
         else:
             scoreref = 5
+
         for prodid in finalprospects:
             if read.readnutriscore(prodid) == "a":
                 scoresubstitute = 1
@@ -227,13 +239,17 @@ class Interface:
                 scoresubstitute = 5
             else:
                 scoresubstitute = 6
-            if scoresubstitute < scoreref:
+            if scoreref == 1 and scoresubstitute == scoreref:
+                substituteid = prodid
+            elif scoresubstitute < scoreref:
                 substituteid = prodid
                 break
         write = Writemanager()
         baseproductinfos = read.selectproductdata(productid)  
         surrogateinfos = read.selectproductdata(substituteid)   
         surrogateshops = read.readproductshopshop(substituteid) 
+        if substituteid == None:
+            print("Pas de substituts valables trouvés")
         for items in surrogateinfos:
             if items == None:
                 items = "Pas d'infos"
@@ -262,9 +278,9 @@ class Interface:
                     write.writesurrogate(productid,substituteid)
                     cond = False
                     print("Produit enregistré.")
+                    
                 elif userinput.lower() == "n":
                     cond = False
-                    self.menuprompt()
                 else:
                     raise TypeError
             except TypeError:
@@ -291,8 +307,8 @@ class Interface:
         
         read = Readmanager()
         surrogates = read.readsurrogate()
-        allproduct = [] #list of tuple
-        allsurrogates = [] #list of tuples
+        allproduct = []
+        allsurrogates = []
         allprodshops = []
         allsurrshops = []
         for couples in surrogates:
@@ -305,52 +321,71 @@ class Interface:
             shopssurro = read.readproductshopshop(couples[1])
             allprodshops.append(shopsproducts)
             allsurrshops.append(shopssurro)
-        listlinksprod = []
-        listlinksurr = []
-        listshopprod = []
-        listshopsurr = []
-        namesprod = []
-        namesurro = []
-
-        for items in allsurrogates:  
-            reslinks = max(items, key = len)
-            listlinksurr.append(reslinks)
-            namesurro.append(items[0])
-        for items in allproduct:
-            reslinks = max(items, key = len)
-            listlinksprod.append(reslinks)
-            namesprod.append(items[0])
-        for items in allprodshops:
-            listshopprod.append(items)
-        for items in allsurrshops:
-            listshopsurr.append(items)
-
-        maxlenlinkprod = len(max(listlinksprod, key = len))
-        maxlenlinksurr = len(max(listlinksurr, key = len))
-        maxlennamesprod = len(max(namesprod, key = len))
-        maxlennamessurr = len(max(namesurro, key = len))
-        maxlenlistshop = 0
-        def totallen(liste):
-            total = 0
-            for shops in liste:
-                total += len(shops)
-
-            return total
-
-        for shopslist in listshopsurr:
-            if totallen(shopslist) > maxlenlistshop:
-                maxlenlistshop = totallen(shopslist)
         
-        totallenprod = (maxlenlinkprod + maxlennamesprod + 3 + 6)
-        totallensurr = (maxlenlinksurr + maxlennamessurr + maxlenlistshop + 3 + 6)
 
-        top = print("|","_" * 25,"Produit de Base","_" * 25,"|","_" * 25, "Substitut", "_" * 25,"|" )
-        sep = print("*" * 135)
-        name = print(f"Nom: {allproduct[indexprod1][indexprod2]}                                           Nom: {allsurrogates[indexsurr1][indexsurr2]}")
-        nutri = print(f"")
-        shops = print()
-        link = print()        
-             
+        def top(): 
+            print("|","_" * 25,"Produit de Base","_" * 25,"|","_" * 25, "Substitut", "_" * 25,"|" )
+
+        def sep():
+            print("*" * 135)
+
+        def name(productname,surrname):
+            lenght = 66
+            if len(productname) > lenght:
+                begining = productname[:55]
+                ending = productname[55:]
+                print(f"Nom: {begining}"," " * (63 - len(begining)),f"|Nom: {surrname}")
+                print(" " * 5, f"{ending}")
+            else:
+                print(f"Nom: {productname}"," " * (63 -len(productname)),f"|Nom: {surrname}")
+
+        def nutri(nutriprod,nutrisurr):
+            print(f"Nutriscore: {nutriprod}"," " * 55,f"|Nutriscore: {nutrisurr}")
+
+        def shops(prodshops,surrshops):
+            lenght = 60
+            lenghtproshop = 0
+            prodshopbegining = []
+            prodshopend = []
+            totallenbeginig = 0
+            for shops in prodshops:
+                lenghtproshop += (len(shops) + 4)
+            lenghtproshop += 2
+            if prodshops == []:
+                print(f"Magasins: {prodshops}"," " * 56,f"|Magasins: {surrshops}")
+            elif lenghtproshop > lenght:
+                prodshopbegining.append(prodshops[:2])
+                prodshopend.append(prodshops[2:])
+                for shops in prodshopbegining:
+                    totallenbeginig += len(shops)     
+                print(f"Magasins: {prodshopbegining}"," " * (60 -totallenbeginig),f"|Magasins: {surrshops}")
+                print(" " * 5,f"{prodshopend}")
+            
+            else:
+                print(f"Magasins: {prodshops}"," " * (60 - lenghtproshop),f"|Magasins: {surrshops}")
+
+
+        def link(prodlink,surrlink): 
+            lenghtprodlink = len(prodlink[:55])
+            begining = prodlink[:55]
+            ending = prodlink[55:]
+            print(f"URL: {begining}"," " * (63 - lenghtprodlink),f"|URL: {surrlink}")
+            print(f"{ending}")
+                    
+
+        top(),sep(),sep()
+        
+        for product,surrogate,shopprod,shopsurr in zip(allproduct,allsurrogates,allprodshops,allsurrshops):
+            name(product[0],surrogate[0])
+            nutri(product[1],surrogate[1])
+            shops(shopprod,shopsurr)
+            link(product[2],surrogate[2])
+            sep()
+            sep()
+            
+            
+
+        
     
     def updatedb(self):      #OK
         
