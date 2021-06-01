@@ -1,36 +1,30 @@
-from re import sub
-import mysql.connector
-from mysql.connector import errorcode as er
 from tqdm import tqdm
 
-import config
-from readmanager import Readmanager
-from databasecreator import Dbmanager
-from writemanager import Writemanager
+from entities.readmanager import Readmanager as Readmanager
+from entities.databasecreator import Dbmanager as Dbmanager
+from entities.writemanager import Writemanager as Writemanager
+
 
 class Interface:
-
-
     def __init__(self):
         pass
-    
-    def welcome(self):                             #OK
+
+    def welcome(self):  # OK
 
         welcome = "# Bienvenue dans OpenFoodFact Comparateur. #"
         nextmenu = "#    Appuyez sur Entrée pour continuer.    #"
         print()
         print()
         for characters in welcome:
-            print("#", end = "")
+            print("#", end="")
         print()
         print(welcome)
         print(nextmenu)
         for characters in welcome:
-            print("#", end = "")
+            print("#", end="")
         print()
         print()
 
-        
         cond = True
         while cond:
             try:
@@ -42,33 +36,29 @@ class Interface:
                     raise ValueError
             except ValueError:
                 print("Appuyez sur la touche entrée de votre clavier svp")
-            
-        
-                
-            
 
-    def menuprompt(self):                  #OK
+    def menuprompt(self):  # OK
 
         menu = {
-            1 : 'Chercher un nouveau produit.',         
-            2 : 'Afficher les favoris.',                
-            3 : 'Mettre a jour la base de données.',   
-            4 : 'Quitter le programme.'                
+            1: "Chercher un nouveau produit.",
+            2: "Afficher les favoris.",
+            3: "Mettre a jour la base de données.",
+            4: "Quitter le programme.",
         }
         for key, values in menu.items():
-            print(key, ":" ,values)
+            print(key, ":", values)
 
         cond = True
         while cond:
             try:
                 userinput = int(input("Entrez votre choix (1-4): "))
-                if userinput in range(1,5): 
+                if userinput in range(1, 5):
                     cond = False
                 else:
-                    print("Veuillez entrer un nombre valide. (1-4)")
-            except:
+                    raise ValueError
+            except ValueError:
                 print("Veuillez entrer un nombre valide. (1-4)")
-            
+
         if userinput == 1:
             self.newproduct()
         elif userinput == 2:
@@ -78,21 +68,21 @@ class Interface:
         else:
             self.exitmenu()
 
-    def newproduct(self):                #OK
-        
+    def newproduct(self):  # OK
+
         read = Readmanager()
 
-        #choix de la cate parmis 5 au hasard
+        # choix de la cate parmis 5 au hasard
         fivecateids = read.read5randomcate()
         fivecatename = []
         for ids in fivecateids:
             fivecatename.append(read.readcategory(ids))
         menu = {
-            1 : fivecatename[0],         
-            2 : fivecatename[1],                
-            3 : fivecatename[2],   
-            4 : fivecatename[3],
-            5 : fivecatename[4]                
+            1: fivecatename[0],
+            2: fivecatename[1],
+            3: fivecatename[2],
+            4: fivecatename[3],
+            5: fivecatename[4],
         }
         for key, values in menu.items():
             print(key, ":", values)
@@ -100,7 +90,7 @@ class Interface:
         while cond:
             try:
                 userinput = int(input("entrez votre choix (1-5) : "))
-                if userinput in range(1,6):
+                if userinput in range(1, 6):
                     cond = False
                 else:
                     raise ValueError
@@ -122,9 +112,8 @@ class Interface:
         else:
             id = read.readcategory(fivecatename[4])
             self.chooseproduct(id)
-        
-        
-    def chooseproduct(self,idcate):        #OK
+
+    def chooseproduct(self, idcate):  # OK
 
         read = Readmanager()
         checkmorethanfive = read.readproductcatecate(idcate)
@@ -145,13 +134,12 @@ class Interface:
             for prodname in listprod:
                 print(x, ":", prodname)
                 x += 1
-        
 
         cond = True
         while cond:
             try:
                 userinput = int(input("Veuillez selectionner un produit (1-5) : "))
-                if userinput in range(1,6):
+                if userinput in range(1, 6):
                     cond = False
                 else:
                     raise ValueError
@@ -168,12 +156,12 @@ class Interface:
             self.algosubstitu(fiveproducts[3])
         else:
             self.algosubstitu(fiveproducts[4])
-    
-    def algosubstitu(self,productid):   #OK
+
+    def algosubstitu(self, productid):  # OK
 
         print("RECHERCHE DE VOTRE SUBSTITUT VEUILLEZ PATIENTER.")
         read = Readmanager()
- 
+
         listcatename = read.readproductcateprod(productid)
 
         listcateids = []
@@ -184,19 +172,19 @@ class Interface:
         if read.readsamecate(listcateids) != []:
             prospectprodid.append(read.readsamecate(listcateids))
 
-        prospectprodid = prospectprodid[0]     
+        prospectprodid = prospectprodid[0]
         while productid in prospectprodid:
             del prospectprodid[prospectprodid.index(productid)]
 
-        listofproductwithcategories = []        
+        listofproductwithcategories = []
         for product in tqdm(prospectprodid):
             catesprodname = read.readproductcatecateid(product)
-            datas = (product,catesprodname)
+            datas = (product, catesprodname)
             listofproductwithcategories.append(datas)
 
         finalprospects = []
         alternateprospects = []
-        
+
         for productandcates in tqdm(listofproductwithcategories):
             commons = list(set(productandcates[1]).intersection(listcateids))
             score = len(commons)
@@ -208,9 +196,7 @@ class Interface:
                 finalprospects.append(productandcates[0])
             elif score == len(listcateids) - 3:
                 alternateprospects.append(productandcates[0])
-        
-        
-            
+
         scoreref = 0
         scoresubstitute = 0
         substituteid = 0
@@ -229,7 +215,7 @@ class Interface:
         for prodid in finalprospects:
             if read.readnutriscore(prodid) == "a":
                 scoresubstitute = 1
-            elif  read.readnutriscore(prodid) == "b":
+            elif read.readnutriscore(prodid) == "b":
                 scoresubstitute = 2
             elif read.readnutriscore(prodid) == "c":
                 scoresubstitute = 3
@@ -245,16 +231,16 @@ class Interface:
                 substituteid = prodid
                 break
         write = Writemanager()
-        baseproductinfos = read.selectproductdata(productid)  
-        surrogateinfos = read.selectproductdata(substituteid)   
-        surrogateshops = read.readproductshopshop(substituteid) 
-        if substituteid == None:
+        baseproductinfos = read.selectproductdata(productid)
+        surrogateinfos = read.selectproductdata(substituteid)
+        surrogateshops = read.readproductshopshop(substituteid)
+        if substituteid is None:
             print("Pas de substituts valables trouvés")
         for items in surrogateinfos:
-            if items == None:
+            if items is None:
                 items = "Pas d'infos"
         for items in surrogateshops:
-            if items == None:
+            if items is None:
                 items = "Pas d'infos"
 
         print(
@@ -266,8 +252,7 @@ class Interface:
             f"Nutriscore :             | {surrogateinfos[1]}           \n"
             f"Magasins :               | {surrogateshops}              \n"
             f"URL :                    | {surrogateinfos[2]}           \n"
-            "__________________________________________________________\n" 
-            
+            "__________________________________________________________\n"
         )
 
         cond = True
@@ -275,21 +260,23 @@ class Interface:
             try:
                 userinput = input("Voulez-vous sauvegarder ce substitut ? (o/n) : ")
                 if userinput.lower() == "o":
-                    write.writesurrogate(productid,substituteid)
+                    write.writesurrogate(productid, substituteid)
                     cond = False
                     print("Produit enregistré.")
-                    
+
                 elif userinput.lower() == "n":
                     cond = False
                 else:
                     raise TypeError
             except TypeError:
                 print("Veuillez entrer une réponse valide svp (o/n) ")
-        
+
         cond = True
         while cond:
             try:
-                userinput = input("Voulez vous chercher un autre produit (P) ou retourner au menu principal (M) ? : ")
+                userinput = input(
+                    "Voulez vous chercher un autre produit (P) ou retourner au menu principal (M) ? : "
+                )
                 if userinput.lower() == "p":
                     self.newproduct()
                     cond = False
@@ -301,10 +288,8 @@ class Interface:
             except TypeError:
                 print("Veuillez entrer un choix valide svp")
 
-
-            
     def favorites(self):
-        
+
         read = Readmanager()
         surrogates = read.readsurrogate()
         allproduct = []
@@ -321,78 +306,99 @@ class Interface:
             shopssurro = read.readproductshopshop(couples[1])
             allprodshops.append(shopsproducts)
             allsurrshops.append(shopssurro)
-        
 
-        def top(): 
-            print("|","_" * 25,"Produit de Base","_" * 25,"|","_" * 25, "Substitut", "_" * 25,"|" )
+        def top():
+            print(
+                "|",
+                "_" * 25,
+                "Produit de Base",
+                "_" * 25,
+                "|",
+                "_" * 25,
+                "Substitut",
+                "_" * 25,
+                "|",
+            )
 
         def sep():
             print("*" * 135)
 
-        def name(productname,surrname):
+        def name(productname, surrname):
             lenght = 66
             if len(productname) > lenght:
                 begining = productname[:55]
                 ending = productname[55:]
-                print(f"Nom: {begining}"," " * (63 - len(begining)),f"|Nom: {surrname}")
+                print(
+                    f"Nom: {begining}", " " * (63 - len(begining)), f"|Nom: {surrname}"
+                )
                 print(" " * 5, f"{ending}")
             else:
-                print(f"Nom: {productname}"," " * (63 -len(productname)),f"|Nom: {surrname}")
+                print(
+                    f"Nom: {productname}",
+                    " " * (63 - len(productname)),
+                    f"|Nom: {surrname}",
+                )
 
-        def nutri(nutriprod,nutrisurr):
-            print(f"Nutriscore: {nutriprod}"," " * 55,f"|Nutriscore: {nutrisurr}")
+        def nutri(nutriprod, nutrisurr):
+            print(f"Nutriscore: {nutriprod}", " " * 55, f"|Nutriscore: {nutrisurr}")
 
-        def shops(prodshops,surrshops):
+        def shops(prodshops, surrshops):
             lenght = 60
             lenghtproshop = 0
             prodshopbegining = []
             prodshopend = []
             totallenbeginig = 0
             for shops in prodshops:
-                lenghtproshop += (len(shops) + 4)
+                lenghtproshop += len(shops) + 4
             lenghtproshop += 2
             if prodshops == []:
-                print(f"Magasins: {prodshops}"," " * 56,f"|Magasins: {surrshops}")
+                print(f"Magasins: {prodshops}", " " * 56, f"|Magasins: {surrshops}")
             elif lenghtproshop > lenght:
                 prodshopbegining.append(prodshops[:2])
                 prodshopend.append(prodshops[2:])
                 for shops in prodshopbegining:
-                    totallenbeginig += len(shops)     
-                print(f"Magasins: {prodshopbegining}"," " * (60 -totallenbeginig),f"|Magasins: {surrshops}")
-                print(" " * 5,f"{prodshopend}")
-            
+                    totallenbeginig += len(shops)
+                print(
+                    f"Magasins: {prodshopbegining}",
+                    " " * (60 - totallenbeginig),
+                    f"|Magasins: {surrshops}",
+                )
+                print(" " * 5, f"{prodshopend}")
+
             else:
-                print(f"Magasins: {prodshops}"," " * (60 - lenghtproshop),f"|Magasins: {surrshops}")
+                print(
+                    f"Magasins: {prodshops}",
+                    " " * (60 - lenghtproshop),
+                    f"|Magasins: {surrshops}",
+                )
 
-
-        def link(prodlink,surrlink): 
+        def link(prodlink, surrlink):
             lenghtprodlink = len(prodlink[:55])
             begining = prodlink[:55]
             ending = prodlink[55:]
-            print(f"URL: {begining}"," " * (63 - lenghtprodlink),f"|URL: {surrlink}")
+            print(f"URL: {begining}", " " * (63 - lenghtprodlink), f"|URL: {surrlink}")
             print(f"{ending}")
-                    
 
-        top(),sep(),sep()
-        
-        for product,surrogate,shopprod,shopsurr in zip(allproduct,allsurrogates,allprodshops,allsurrshops):
-            name(product[0],surrogate[0])
-            nutri(product[1],surrogate[1])
-            shops(shopprod,shopsurr)
-            link(product[2],surrogate[2])
+        top(), sep(), sep()
+
+        for product, surrogate, shopprod, shopsurr in zip(
+            allproduct, allsurrogates, allprodshops, allsurrshops
+        ):
+            name(product[0], surrogate[0])
+            nutri(product[1], surrogate[1])
+            shops(shopprod, shopsurr)
+            link(product[2], surrogate[2])
             sep()
             sep()
-            
-            
 
-        
-    
-    def updatedb(self):      #OK
-        
+    def updatedb(self):  # OK
+
         cond = True
         while cond:
             try:
-                userinput = input("Voulez vous mettre a jour la base de données? (y/n) : ")
+                userinput = input(
+                    "Voulez vous mettre a jour la base de données? (y/n) : "
+                )
                 if userinput.lower() == "y" or userinput.lower() == "n":
                     cond = False
                 else:
@@ -401,7 +407,10 @@ class Interface:
                 print("Veuillez entrer une lettre (y ou n )")
 
         if userinput == "y":
-            print("Veuillez patienter pendant la mise a jour de la base de données, ceci peut prendre plusieures minutes.")
+            print(
+                "Veuillez patienter pendant la mise a jour de la base de données,"
+                + "ceci peut prendre plusieures minutes."
+            )
             data = Dbmanager()
             data.contructdatabase()
             data.builddatabasetables()
@@ -416,17 +425,16 @@ class Interface:
         else:
             self.menuprompt()
 
+    def exitmenu(self):  # OK
 
-    def exitmenu(self):              #OK
-        
         cond = True
         while cond:
             try:
                 userinput = input("Voulez vous quitter le programme ? (Y/N) : ")
                 if userinput.lower() == "y" or userinput.lower() == "n":
-                   cond = False
+                    cond = False
                 else:
-                    raise TypeError    
+                    raise TypeError
             except TypeError:
                 print("Veuillez entrer une lettre (y ou n)")
 
