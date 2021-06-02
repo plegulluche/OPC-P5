@@ -4,10 +4,27 @@ import entities.config as config
 
 
 class Readmanager:
+    """
+    Class that manage the reading of the database.
+    Each method handle a very specific aspect of each table.
+    Read the method doc for more infos.
+    """
+
     def __init__(self):
+        """
+        Readmanager class constructor.
+        """
         pass
 
-    def readcategory(self, value):  # OK
+    def readcategory(self, value):
+        """
+        Reads the Category table of the food database.
+
+        :param : Id or name of a category
+        :type : int or str
+        :return : name of category as str if param is int
+                  id of category as int if param is str
+        """
 
         cnxvar = mysql.connector.connect(**config.userid)
         readcatecursor = cnxvar.cursor()
@@ -33,7 +50,15 @@ class Readmanager:
 
         return retour
 
-    def readproductnameorid(self, value):  # OK
+    def readproductnameorid(self, value):
+        """
+        Read the product name only from Product table of the food database.
+
+        :param : Id or name of the product
+        :type : int or str
+        :return : name of product as str if param is int
+                  id of product as int if param is str
+        """
 
         cnxvar = mysql.connector.connect(**config.userid)
         prodcursor = cnxvar.cursor()
@@ -58,11 +83,14 @@ class Readmanager:
 
         return retour
 
-    def selectproductdata(self, idprod):  # OK
+    def selectproductdata(self, idprod):
         """
+        Reads productname,nutriscore and url of a product from
+        the Product table in food database.
 
-        Takes one param : INT (productID)
-        Return : Tuple containing values as strings
+        :param : product id
+        :type : int
+        :return : Tuple containing values as strings
 
         """
         cnxvar = mysql.connector.connect(**config.userid)
@@ -79,7 +107,15 @@ class Readmanager:
 
         return retour
 
-    def readshops(self, shopidorname):  # OK
+    def readshops(self, shopidorname):
+        """
+        Read the shopname or the shopid from Shop table from the food database.
+
+        :param : shopid or shopname
+        :type : int or str
+        :return : shopname as str or shopid as int
+
+        """
 
         cnxvar = mysql.connector.connect(**config.userid)
         shopcursor = cnxvar.cursor()
@@ -104,7 +140,15 @@ class Readmanager:
 
         return retour
 
-    def readproductcateprod(self, productid):  # OK
+    def readproductcateprod(self, productid):
+        """
+        Read all the category name associated to the product in the
+        ProductCategory table.
+
+        :param : productid
+        :type : int
+        :return :  list of str
+        """
 
         cnxvar = mysql.connector.connect(**config.userid)
         readcursor = cnxvar.cursor()
@@ -125,6 +169,14 @@ class Readmanager:
         return retourids
 
     def readproductcatecateid(seld, productid):
+        """
+        Read all the category id associated to the product in the
+        ProductCategory table.
+
+        :param : productid
+        :type : int
+        :return : list of int
+        """
         cnxvar = mysql.connector.connect(**config.userid)
         readcursor = cnxvar.cursor()
         retourids = []
@@ -140,7 +192,16 @@ class Readmanager:
 
         return retourids
 
-    def readproductcatecate(self, categoryid):  # OK
+    def readproductcatecate(self, categoryid):
+        """
+        Read the ProductCategory table inside food database,
+        and extract the product names assiociated with the category id
+        in the parameter.
+
+        :param : category id
+        :type : int
+        :return : list of str
+        """
 
         cnxvar = mysql.connector.connect(**config.userid)
         readcursor = cnxvar.cursor()
@@ -161,7 +222,15 @@ class Readmanager:
 
         return retourids
 
-    def readproductshopshop(self, productid):  # OK
+    def readproductshopshop(self, productid):
+        """
+        Read the ProductShop table from food database and extract
+        the shopname corresponding to the product id in the param.
+
+        :param : productid
+        :type : int
+        :return : list of str
+        """
 
         cnxvar = mysql.connector.connect(**config.userid)
         readcursor = cnxvar.cursor()
@@ -182,7 +251,15 @@ class Readmanager:
 
         return retourids
 
-    def readproductshopproducts(self, shopid):  # OK
+    def readproductshopproducts(self, shopid):
+        """
+        Read the ProductInShop table and extract all the products
+        names assiociated to the shopid in param.
+
+        :param : shopid
+        :type : int
+        :return : list of str
+        """
 
         cnxvar = mysql.connector.connect(**config.userid)
         readcursor = cnxvar.cursor()
@@ -203,7 +280,13 @@ class Readmanager:
 
         return retourids
 
-    def readsurrogate(self):  # OK
+    def readsurrogate(self):
+        """
+        Read the Surrogate table in the food database.
+        Fetch the product and their assiociated surrogate.
+
+        :return : list of tuples
+        """
 
         cnxvar = mysql.connector.connect(**config.userid)
         readcursor = cnxvar.cursor()
@@ -219,7 +302,13 @@ class Readmanager:
 
         return retour
 
-    def read5randomcate(self):  # OK
+    def read5randomcate(self):
+        """
+        Read the Category table from food database and select
+        5 random category id from it.
+
+        :return : list of int
+        """
 
         cnxvar = mysql.connector.connect(**config.userid)
         prodcursor = cnxvar.cursor()
@@ -237,6 +326,14 @@ class Readmanager:
         return retour
 
     def read5randomproduct(self, category):
+        """
+        Read the ProductCategory table in the food database and fetch
+        5 random products from the category in param.
+
+        :param : category id
+        :type : int
+        :return : list of int
+        """
 
         cnxvar = mysql.connector.connect(**config.userid)
         prodcursor = cnxvar.cursor()
@@ -253,6 +350,14 @@ class Readmanager:
         return retour
 
     def readsamecate(self, valuelist):
+        """
+        Read ProductCategory table and fetch all product with the same
+        categories as the ones in the list of param.
+
+        :param : list of category id
+        :type : list of int
+        :return : list of int
+        """
 
         cnxvar = mysql.connector.connect(**config.userid)
         readcursor = cnxvar.cursor()
@@ -277,6 +382,15 @@ class Readmanager:
         return retour
 
     def readnutriscore(self, productid):
+        """
+        Read Product table from food database,
+        and fetch the nutriscore of the product corresponding to
+        the id in param.
+
+        :param : product id
+        :type : int
+        :return : str
+        """
 
         cnxvar = mysql.connector.connect(**config.userid)
         readcursor = cnxvar.cursor()

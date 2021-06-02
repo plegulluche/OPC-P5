@@ -5,11 +5,24 @@ from entities.datacleaner import Datacleaner as Datacleaner
 
 
 class Writemanager:
+    """
+    Class responsible of the writing of data inside the food database.
+    Each method can write inside a specific table.
+    See the methode doc for more information on each method.
+    """
+
     def __init__(self):
+        """
+        Writemanager class constructor.
+        """
 
         self.data = Datacleaner()
 
     def writecategories(self):
+        """
+        Use data from datacleaner.categorylist and write inside
+        Category table from food database.
+        """
 
         categoryapi = self.data.categorylist
         cnxvar = mysql.connector.connect(**config.userid)
@@ -25,6 +38,10 @@ class Writemanager:
         print("PIERR DEBUG: categories data inserted.")
 
     def writeproduct(self):
+        """
+        Use data from datacleaner.productslist and write inside
+        Product table from food database.
+        """
 
         apiproducts = self.data.productslist
         cnxvar = mysql.connector.connect(**config.userid)
@@ -40,6 +57,10 @@ class Writemanager:
         print("PIERR DEBUG: product data inserted.")
 
     def writeshops(self):
+        """
+        Use data from datacleaner.shoplist and write inside
+        Shops table inside food database.
+        """
 
         shops = self.data.shoplist
         cnxvar = mysql.connector.connect(**config.userid)
@@ -55,6 +76,10 @@ class Writemanager:
         print("PIERR DEBUG: shop data inserted.")
 
     def writeproductcategory(self):
+        """
+        Use data from datacleaner.productlist to write inside
+        ProductCategory table inside food database.
+        """
 
         cnxvar = mysql.connector.connect(**config.userid)
         prodcatecursor = cnxvar.cursor()
@@ -91,6 +116,10 @@ class Writemanager:
         print("PIERR DEBUG: product category insertion done.")
 
     def writeproductinshop(self):
+        """
+        Use datacleaner.productlist to write data inside
+        ProductInShop table from food database.
+        """
 
         cnxvar = mysql.connector.connect(**config.userid)
         prodshopcursor = cnxvar.cursor()
@@ -124,6 +153,16 @@ class Writemanager:
         print("PIERR DEBUG: product shop insertion done.")
 
     def writesurrogate(self, productid, surrogateid):
+        """
+        This method is called by the interface.algosubstitu method
+        when the user decide to save the result of the substitute search.
+        Write inside Surrogate table inside food database.
+
+        :param a: productid
+        :type a: int
+        :param b: product id
+        :type b: int
+        """
 
         cnxvar = mysql.connector.connect(**config.userid)
         writecursor = cnxvar.cursor()
@@ -136,6 +175,10 @@ class Writemanager:
         cnxvar.close()
 
     def cleantables(self):
+        """
+        Method to erase all duplicates inside the tables
+        Product, Shops and Category inside food database.
+        """
 
         cnxvar = mysql.connector.connect(**config.userid)
         doublescursor = cnxvar.cursor()

@@ -6,10 +6,27 @@ from entities.writemanager import Writemanager as Writemanager
 
 
 class Interface:
+    """
+    Class managing data output in the console,
+    organising them in a form of a menu managing inputs.
+
+    Each method correspond to a menu, when the use enter the
+    corresponding input a method is called to open the
+    menu wich match the input.
+    """
+
     def __init__(self):
+        """
+        interface class constructor.
+        """
         pass
 
-    def welcome(self):  # OK
+    def welcome(self):
+        """
+        Display the welcome menu.
+
+        catch any input error.
+        """
 
         welcome = "# Bienvenue dans OpenFoodFact Comparateur. #"
         nextmenu = "#    Appuyez sur Entrée pour continuer.    #"
@@ -37,7 +54,12 @@ class Interface:
             except ValueError:
                 print("Appuyez sur la touche entrée de votre clavier svp")
 
-    def menuprompt(self):  # OK
+    def menuprompt(self):
+        """
+        Display the main menu.
+
+        catch any input errors.
+        """
 
         menu = {
             1: "Chercher un nouveau produit.",
@@ -68,11 +90,21 @@ class Interface:
         else:
             self.exitmenu()
 
-    def newproduct(self):  # OK
+    def newproduct(self):
+        """
+        This method is called when the option #1 is selected
+        by the user in the menuprompt method.
+
+        Displays a menu from which the user must select a category
+        from 5 random categories fetched in the database.
+
+        Call the chooseproduct method passing it the id from the choosen category
+        as int.
+
+        catch any input errors.
+        """
 
         read = Readmanager()
-
-        # choix de la cate parmis 5 au hasard
         fivecateids = read.read5randomcate()
         fivecatename = []
         for ids in fivecateids:
@@ -113,7 +145,19 @@ class Interface:
             id = read.readcategory(fivecatename[4])
             self.chooseproduct(id)
 
-    def chooseproduct(self, idcate):  # OK
+    def chooseproduct(self, idcate):
+        """
+        This method is called when the user enter the correct input
+        in the newproduct method.
+        Display a menu with 5 random products choosen from the database
+        corresponding to the category the user selected.
+
+        :param : The category id
+        :type : int
+
+        Call the algosubstitu method passing it the productid
+        as int when the user select a product.
+        """
 
         read = Readmanager()
         checkmorethanfive = read.readproductcatecate(idcate)
@@ -157,7 +201,20 @@ class Interface:
         else:
             self.algosubstitu(fiveproducts[4])
 
-    def algosubstitu(self, productid):  # OK
+    def algosubstitu(self, productid):
+        """
+        Search in the database a product, corresponding
+        to the one selected by the use in the chooseproduct
+        method, and with a better nutriscore value.
+        Display an array of all its datas.
+        Also allow the user to register the result in the database.
+
+        :param : id of the selected product
+        :type : int
+
+        call the newproduct method or the menuprompt method
+        depending of the userinput.
+        """
 
         print("RECHERCHE DE VOTRE SUBSTITUT VEUILLEZ PATIENTER.")
         read = Readmanager()
@@ -289,6 +346,10 @@ class Interface:
                 print("Veuillez entrer un choix valide svp")
 
     def favorites(self):
+        """
+        Display an array with all the datas of the favorites
+        registered in the Surrogate table in the database.
+        """
 
         read = Readmanager()
         surrogates = read.readsurrogate()
@@ -391,7 +452,11 @@ class Interface:
             sep()
             sep()
 
-    def updatedb(self):  # OK
+    def updatedb(self):
+        """
+        Call all the methods to recreate the database, call the API
+        to fetch new datas and fill the database with those new datas.
+        """
 
         cond = True
         while cond:
@@ -425,7 +490,10 @@ class Interface:
         else:
             self.menuprompt()
 
-    def exitmenu(self):  # OK
+    def exitmenu(self):
+        """
+        Display the exit menu.
+        """
 
         cond = True
         while cond:

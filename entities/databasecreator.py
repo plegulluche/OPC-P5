@@ -14,6 +14,7 @@ class Dbmanager:
         self.filetoconstructdb = config.filefordbcreator
 
     def contructdatabase(self):
+        """Method to construct the database."""
 
         try:
             cnx = mysql.connector.connect(**self.logintomysqlnodb)
@@ -35,6 +36,10 @@ class Dbmanager:
         cnx.close()
 
     def builddatabasetables(self):
+        """
+        Use the corresponding file to construct,
+        the tables inside the database.
+        """
 
         try:
             cnx = mysql.connector.connect(**self.logintomysql)

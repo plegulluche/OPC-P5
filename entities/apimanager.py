@@ -3,6 +3,11 @@ from tqdm import tqdm
 
 
 class Apimanager:
+    """
+    Class to fetch data from the Open
+    Food Fact API.
+    """
+
     def __init__(self):
         self.rawcategorydata = None
         self.rawproductdata = None
@@ -10,6 +15,11 @@ class Apimanager:
         self.getproductbycategory()
 
     def getcategory(self):
+        """
+        Get category data from the API.
+
+        Return a dictionnary of values.
+        """
 
         response = requests.get("https://fr.openfoodfacts.org/categories.json")
 
@@ -18,6 +28,12 @@ class Apimanager:
         self.rawcategorydata = data
 
     def geteightcategories(self):
+        """
+        Exctract 8 categories with the most products
+        from the category datas from getcategory().
+
+        Return a list.
+        """
 
         eightcategories = []
 
@@ -33,6 +49,10 @@ class Apimanager:
         return eightcategories
 
     def getproductbycategory(self):
+        """
+        Get product from the API,
+        return a list.
+        """
 
         eight = self.geteightcategories()
         productsliste = []
@@ -40,7 +60,9 @@ class Apimanager:
             for page in tqdm(range(1, 11)):
                 r2 = requests.get(
                     "https://fr.openfoodfacts.org/cgi/search.pl?action=process"
-                    + "&tagtype_0=categories&tag_contains_0=contains&tag_0={}".format(category)
+                    + "&tagtype_0=categories&tag_contains_0=contains&tag_0={}".format(
+                        category
+                    )
                     + "&tag_contains_1=contains&tag_1=france&page_size=50"
                     + "&fields=url,categories_tags_fr,product_name,stores_tags"
                     + ",nutriscore_grade&tagtype_1=purchase_places&sort_by="

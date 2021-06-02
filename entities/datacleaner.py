@@ -8,6 +8,14 @@ from entities.category import Category as Category
 
 
 class Datacleaner:
+    """
+    Class that sort data from API by instanciating
+    data objects with corresponding values,
+    objetcs are created and stored into Datacleaner
+    object attributes during instanciation
+    of the Datacleaner object.
+    """
+
     def __init__(self):
 
         self.api = 0
@@ -24,17 +32,27 @@ class Datacleaner:
             self.shoplist = self.createshopobjects()
 
     def extractcategoriesnames(self):
+        """
+        Use datas from api.rawcategorydata method
+        to extract the names of the categories.
+
+        return : a list of strings
+        """
 
         allcategories = []
-        for allcategory in self.api.rawcategorydata[
-            "tags"
-        ]:  
+        for allcategory in self.api.rawcategorydata["tags"]:
             category = allcategory["name"]
             allcategories.append(category)
 
         return allcategories
 
     def createcategoryobject(self):
+        """
+        Use data extracted by Datacleaner.extractcategoriesnames()
+        to instanciate Category class objects.
+
+        return : list of Category class objects
+        """
 
         categoryobjectslist = []
         categories = self.extractcategoriesnames()
@@ -44,6 +62,12 @@ class Datacleaner:
         return categoryobjectslist
 
     def createproductobject(self):
+        """
+        Use datas of api.rawproductdata.
+        Instanciate Product class objects with those datas.
+
+        return : list of Product class objects.
+        """
 
         productlist = []
 
@@ -75,6 +99,12 @@ class Datacleaner:
         return productlist
 
     def getshopslist(self):
+        """
+        Use api.rawproductdata.
+        Sort data to extract all shop data.
+
+        return : list of string.
+        """
 
         self.api.rawproductdata
         shoplist = []
@@ -86,9 +116,15 @@ class Datacleaner:
                     if store not in shoplist:
                         shoplist.append(store)
 
-        return shoplist  
+        return shoplist
 
     def createshopobjects(self):
+        """
+        Use data return by Datacleaner.getshoplist().
+        Instanciate Shop class objects with those datas.
+
+        return : list of Shop class objects.
+        """
 
         shops = self.getshopslist()
         shopsobjectlist = []
