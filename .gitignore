@@ -1,5 +1,5 @@
 virtualenv
-
+MPD P5.architect~
 tests.py
 entities/tests.py
 entities/productcategory.py
@@ -10,6 +10,8 @@ entities/productinshop.py
 *.drawio
 *.xlsx
 *.json
+*.architect
+*.pdf
 
 Onsaisjamais
 plan menu

@@ -163,9 +163,13 @@ class Interface:
         checkmorethanfive = read.readproductcatecate(idcate)
         fiveproducts = None
         if len(checkmorethanfive) <= 5:
-            fiveproducts = read.readproductcatecate(idcate)
+            fiveproductsdisplay = read.readproductcatecate(idcate)
+            idlist = []
+            for product in fiveproductsdisplay:
+                idlist.append(read.readproductnameorid(product))
+            fiveproducts = idlist
             x = 1
-            for product in fiveproducts:
+            for product in fiveproductsdisplay:
                 print(x, ":", product)
                 x += 1
         else:
@@ -217,19 +221,12 @@ class Interface:
         """
 
         print("RECHERCHE DE VOTRE SUBSTITUT VEUILLEZ PATIENTER.")
+        print(productid)
         read = Readmanager()
 
-        listcatename = read.readproductcateprod(productid)
-
-        listcateids = []
-        for cate in listcatename:
-            listcateids.append(read.readcategory(cate))
-
-        prospectprodid = []
-        if read.readsamecate(listcateids) != []:
-            prospectprodid.append(read.readsamecate(listcateids))
-
-        prospectprodid = prospectprodid[0]
+        listcateids = read.readproductcatecateid(productid)
+        prospectprodid = read.readsamecate(listcateids)
+        
         while productid in prospectprodid:
             del prospectprodid[prospectprodid.index(productid)]
 
@@ -240,7 +237,6 @@ class Interface:
             listofproductwithcategories.append(datas)
 
         finalprospects = []
-        alternateprospects = []
 
         for productandcates in tqdm(listofproductwithcategories):
             commons = list(set(productandcates[1]).intersection(listcateids))
@@ -251,99 +247,123 @@ class Interface:
                 finalprospects.append(productandcates[0])
             elif score == len(listcateids) - 2:
                 finalprospects.append(productandcates[0])
-            elif score == len(listcateids) - 3:
-                alternateprospects.append(productandcates[0])
 
-        scoreref = 0
-        scoresubstitute = 0
-        substituteid = 0
-        nutriscoreref = read.readnutriscore(productid)
-        if nutriscoreref == "a":
-            scoreref = 1
-        elif nutriscoreref == "b":
-            scoreref = 2
-        elif nutriscoreref == "c":
-            scoreref = 3
-        elif nutriscoreref == "d":
-            scoreref = 4
+        if finalprospects == []:
+            cond = True
+            while cond:
+                print("Pas de substitut pour ce produit dans la base de donnée")
+                try:
+                    userinput = input(
+                        "Voulez vous chercher un autre produit (P) ou retourner au menu principal (M) ? : "
+                    )
+                    if userinput.lower() == "p":
+                        self.newproduct()
+                        cond = False
+                    elif userinput.lower() == "m":
+                        self.menuprompt()
+                        cond = False
+                    else:
+                        raise TypeError
+                except TypeError:
+                    print("Veuillez entrer un choix valide svp")
+
         else:
-            scoreref = 5
-
-        for prodid in finalprospects:
-            if read.readnutriscore(prodid) == "a":
-                scoresubstitute = 1
-            elif read.readnutriscore(prodid) == "b":
-                scoresubstitute = 2
-            elif read.readnutriscore(prodid) == "c":
-                scoresubstitute = 3
-            elif read.readnutriscore(prodid) == "d":
-                scoresubstitute = 4
-            elif read.readnutriscore(prodid) == "e":
-                scoresubstitute = 5
+            scoreref = 0
+            scoresubstitute = 0
+            substituteid = 0
+            nutriscoreref = read.readnutriscore(productid)
+            if nutriscoreref == "a":
+                scoreref = 1
+            elif nutriscoreref == "b":
+                scoreref = 2
+            elif nutriscoreref == "c":
+                scoreref = 3
+            elif nutriscoreref == "d":
+                scoreref = 4
             else:
-                scoresubstitute = 6
-            if scoreref == 1 and scoresubstitute == scoreref:
-                substituteid = prodid
-            elif scoresubstitute < scoreref:
-                substituteid = prodid
-                break
-        write = Writemanager()
-        baseproductinfos = read.selectproductdata(productid)
-        surrogateinfos = read.selectproductdata(substituteid)
-        surrogateshops = read.readproductshopshop(substituteid)
-        if substituteid is None:
-            print("Pas de substituts valables trouvés")
-        for items in surrogateinfos:
-            if items is None:
-                items = "Pas d'infos"
-        for items in surrogateshops:
-            if items is None:
-                items = "Pas d'infos"
+                scoreref = 5
 
-        print(
-            "                                                          \n"
-            "__________________________________________________________\n"
-            f"Produit de base :        | {baseproductinfos[0]}         \n"
-            f"Nutriscore :             | {baseproductinfos[1]}         \n"
-            f"Substitut :              | {surrogateinfos[0]}           \n"
-            f"Nutriscore :             | {surrogateinfos[1]}           \n"
-            f"Magasins :               | {surrogateshops}              \n"
-            f"URL :                    | {surrogateinfos[2]}           \n"
-            "__________________________________________________________\n"
-        )
-
-        cond = True
-        while cond:
-            try:
-                userinput = input("Voulez-vous sauvegarder ce substitut ? (o/n) : ")
-                if userinput.lower() == "o":
-                    write.writesurrogate(productid, substituteid)
-                    cond = False
-                    print("Produit enregistré.")
-
-                elif userinput.lower() == "n":
-                    cond = False
+            for prodid in finalprospects:
+                if read.readnutriscore(prodid) == "a":
+                    scoresubstitute = 1
+                elif read.readnutriscore(prodid) == "b":
+                    scoresubstitute = 2
+                elif read.readnutriscore(prodid) == "c":
+                    scoresubstitute = 3
+                elif read.readnutriscore(prodid) == "d":
+                    scoresubstitute = 4
+                elif read.readnutriscore(prodid) == "e":
+                    scoresubstitute = 5
                 else:
-                    raise TypeError
-            except TypeError:
-                print("Veuillez entrer une réponse valide svp (o/n) ")
+                    scoresubstitute = 6
 
-        cond = True
-        while cond:
-            try:
-                userinput = input(
-                    "Voulez vous chercher un autre produit (P) ou retourner au menu principal (M) ? : "
-                )
-                if userinput.lower() == "p":
-                    self.newproduct()
-                    cond = False
-                elif userinput.lower() == "m":
-                    self.menuprompt()
-                    cond = False
-                else:
-                    raise TypeError
-            except TypeError:
-                print("Veuillez entrer un choix valide svp")
+                if scoreref == 1 and scoresubstitute == scoreref:
+                    substituteid = prodid
+                elif scoresubstitute < scoreref:
+                    substituteid = prodid
+                    break
+                elif scoresubstitute <= scoreref:
+                    substituteid =prodid
+                    break
+
+            write = Writemanager()
+            print(substituteid)
+            baseproductinfos = read.selectproductdata(productid)
+            surrogateinfos = read.selectproductdata(substituteid)
+            surrogateshops = read.readproductshopshop(substituteid)
+            if substituteid is None:
+                print("Pas de substituts valables trouvés")
+            for items in surrogateinfos:
+                if items is None:
+                    items = "Pas d'infos"
+            for items in surrogateshops:
+                if items is None:
+                    items = "Pas d'infos"
+
+            print(
+                "                                                          \n"
+                "__________________________________________________________\n"
+                f"Produit de base :        | {baseproductinfos[0]}         \n"
+                f"Nutriscore :             | {baseproductinfos[1]}         \n"
+                f"Substitut :              | {surrogateinfos[0]}           \n"
+                f"Nutriscore :             | {surrogateinfos[1]}           \n"
+                f"Magasins :               | {surrogateshops}              \n"
+                f"URL :                    | {surrogateinfos[2]}           \n"
+                "__________________________________________________________\n"
+            )
+
+            cond = True
+            while cond:
+                try:
+                    userinput = input("Voulez-vous sauvegarder ce substitut ? (o/n) : ")
+                    if userinput.lower() == "o":
+                        write.writesurrogate(productid, substituteid)
+                        cond = False
+                        print("Produit enregistré.")
+
+                    elif userinput.lower() == "n":
+                        cond = False
+                    else:
+                        raise TypeError
+                except TypeError:
+                    print("Veuillez entrer une réponse valide svp (o/n) ")
+
+            cond = True
+            while cond:
+                try:
+                    userinput = input(
+                        "Voulez vous chercher un autre produit (P) ou retourner au menu principal (M) ? : "
+                    )
+                    if userinput.lower() == "p":
+                        self.newproduct()
+                        cond = False
+                    elif userinput.lower() == "m":
+                        self.menuprompt()
+                        cond = False
+                    else:
+                        raise TypeError
+                except TypeError:
+                    print("Veuillez entrer un choix valide svp")
 
     def favorites(self):
         """
@@ -489,6 +509,23 @@ class Interface:
 
         else:
             self.menuprompt()
+
+        cond = True
+        while cond:
+            try:
+                userinput = input(
+                    "Voulez vous  retourner au menu principal (o/n) ? : "
+                )
+                if userinput.lower() == "o":
+                    self.menuprompt()
+                    cond = False
+                elif userinput.lower() == "n":
+                    self.exitmenu()
+                    cond = False
+                else:
+                    raise TypeError
+            except TypeError:
+                print("Veuillez entrer un choix valide svp")
 
     def exitmenu(self):
         """

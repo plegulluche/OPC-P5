@@ -86,7 +86,7 @@ class Datacleaner:
                 productname=products.get(keys[2]),
                 shop=products.get(keys[4]),
             )
-            if values["productname"] is not None:
+            if values["productname"] is not None and values["nutriscore"] is not None:
                 productlist.append(
                     Product(
                         nutriscore=values["nutriscore"],
