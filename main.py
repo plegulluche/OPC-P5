@@ -1,7 +1,13 @@
+#!/usr/bin/python3
+# -*- coding: Utf-8 -*
+
 from entities.interface import Interface
 
 
-menu = Interface()
+def main():
+    menu = Interface()
+    menu.welcome()
 
-menu.welcome()
 
+if __name__ == "__main__":
+    main()

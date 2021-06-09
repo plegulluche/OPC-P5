@@ -338,7 +338,7 @@ class Readmanager:
         cnxvar = mysql.connector.connect(**config.userid)
         prodcursor = cnxvar.cursor()
         retour = []
-        query = "SELECT productID FROM ProductCategory WHERE RAND() > 0.9 AND categoryID = %(cateid)s LIMIT 5"
+        query = "SELECT productID FROM ProductCategory WHERE categoryID = %(cateid)s ORDER BY RAND() LIMIT 5"
         prodcursor.execute(query, {"cateid": category})
         for rows in prodcursor.fetchall():
             for values in rows:

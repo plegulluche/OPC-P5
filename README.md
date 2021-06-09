@@ -25,7 +25,8 @@ After a search, if you like the result you can save it for further usage.
 
 # How to use:
 
-Launch main.py
+After installing all dependecies and Python3, go where the main.py is located in your console and type: python3 main.py
+
 
 Press Enter to exit the welcome menu.
 

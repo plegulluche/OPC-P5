@@ -226,7 +226,7 @@ class Interface:
 
         listcateids = read.readproductcatecateid(productid)
         prospectprodid = read.readsamecate(listcateids)
-        
+
         while productid in prospectprodid:
             del prospectprodid[prospectprodid.index(productid)]
 
@@ -303,7 +303,7 @@ class Interface:
                     substituteid = prodid
                     break
                 elif scoresubstitute <= scoreref:
-                    substituteid =prodid
+                    substituteid = prodid
                     break
 
             write = Writemanager()
@@ -471,6 +471,20 @@ class Interface:
             link(product[2], surrogate[2])
             sep()
             sep()
+        cond = True
+        while cond:
+            try:
+                userinput = input("Voulez vous  retourner au menu principal (o/n) ? : ")
+                if userinput.lower() == "o":
+                    self.menuprompt()
+                    cond = False
+                elif userinput.lower() == "n":
+                    self.exitmenu()
+                    cond = False
+                else:
+                    raise TypeError
+            except TypeError:
+                print("Veuillez entrer un choix valide svp")
 
     def updatedb(self):
         """
@@ -513,9 +527,7 @@ class Interface:
         cond = True
         while cond:
             try:
-                userinput = input(
-                    "Voulez vous  retourner au menu principal (o/n) ? : "
-                )
+                userinput = input("Voulez vous  retourner au menu principal (o/n) ? : ")
                 if userinput.lower() == "o":
                     self.menuprompt()
                     cond = False
