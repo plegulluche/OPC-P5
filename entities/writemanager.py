@@ -2,6 +2,7 @@ import mysql.connector
 
 import entities.config as config
 from entities.datacleaner import Datacleaner as Datacleaner
+from tqdm import tqdm
 
 
 class Writemanager:
@@ -27,7 +28,7 @@ class Writemanager:
         categoryapi = self.data.categorylist
         cnxvar = mysql.connector.connect(**config.userid)
         catecursor = cnxvar.cursor()
-        for categorie in categoryapi:
+        for categorie in tqdm(categoryapi):
             query = "INSERT INTO Category(categoryName) VALUES (%(name)s)"
             val = categorie.categoryname
             catecursor.execute(query, {"name": val})
@@ -35,7 +36,7 @@ class Writemanager:
 
         catecursor.close()
         cnxvar.close()
-        print("PIERR DEBUG: categories data inserted.")
+        print("categories data inserted.")
 
     def writeproduct(self):
         """
@@ -46,7 +47,7 @@ class Writemanager:
         apiproducts = self.data.productslist
         cnxvar = mysql.connector.connect(**config.userid)
         prodcursor = cnxvar.cursor()
-        for product in apiproducts:
+        for product in tqdm(apiproducts):
             query = "INSERT INTO Product(productName, linkToURLOFF, nutriScore) VALUES (%(name)s, %(link)s, %(score)s)"
             val = (product.productname, product.linktourl, product.nutriscore)
             prodcursor.execute(query, {"name": val[0], "link": val[1], "score": val[2]})
@@ -54,7 +55,7 @@ class Writemanager:
 
         prodcursor.close()
         cnxvar.close()
-        print("PIERR DEBUG: product data inserted.")
+        print("product data inserted.")
 
     def writeshops(self):
         """
@@ -65,7 +66,7 @@ class Writemanager:
         shops = self.data.shoplist
         cnxvar = mysql.connector.connect(**config.userid)
         shopcursor = cnxvar.cursor()
-        for shop in shops:
+        for shop in tqdm(shops):
             query = "INSERT INTO Shops(shopName) VALUES (%(name)s)"
             val = shop.shopname
             shopcursor.execute(query, {"name": val})
@@ -73,7 +74,7 @@ class Writemanager:
 
         shopcursor.close()
         cnxvar.close()
-        print("PIERR DEBUG: shop data inserted.")
+        print("shop data inserted.")
 
     def writeproductcategory(self):
         """
@@ -84,7 +85,7 @@ class Writemanager:
         cnxvar = mysql.connector.connect(**config.userid)
         prodcatecursor = cnxvar.cursor()
 
-        for products in self.data.productslist:
+        for products in tqdm(self.data.productslist):
             prodcate = products.categories
             for categorie in prodcate:
                 cate = categorie
@@ -113,7 +114,7 @@ class Writemanager:
         prodcatecursor.close()
         cnxvar.close()
 
-        print("PIERR DEBUG: product category insertion done.")
+        print("product category insertion done.")
 
     def writeproductinshop(self):
         """
@@ -124,7 +125,7 @@ class Writemanager:
         cnxvar = mysql.connector.connect(**config.userid)
         prodshopcursor = cnxvar.cursor()
 
-        for products in self.data.productslist:
+        for products in tqdm(self.data.productslist):
             prodshops = products.shop
             if prodshops is not None:
                 for shops in prodshops:
@@ -150,7 +151,7 @@ class Writemanager:
         prodshopcursor.close()
         cnxvar.close()
 
-        print("PIERR DEBUG: product shop insertion done.")
+        print("product shop insertion done.")
 
     def writesurrogate(self, productid, surrogateid):
         """

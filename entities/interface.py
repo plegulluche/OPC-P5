@@ -105,6 +105,7 @@ class Interface:
         """
 
         read = Readmanager()
+        print("Veuillez choisir une catégorie parmis les 5 suivantes :")
         fivecateids = read.read5randomcate()
         fivecatename = []
         for ids in fivecateids:
@@ -121,7 +122,8 @@ class Interface:
         cond = True
         while cond:
             try:
-                userinput = int(input("entrez votre choix (1-5) : "))
+                userinput = int(input("Votre choix : "))
+
                 if userinput in range(1, 6):
                     cond = False
                 else:
@@ -160,6 +162,7 @@ class Interface:
         """
 
         read = Readmanager()
+        print("Voici 5 produits veuillez en selectionner un.")
         checkmorethanfive = read.readproductcatecate(idcate)
         fiveproducts = None
         if len(checkmorethanfive) <= 5:
@@ -186,7 +189,8 @@ class Interface:
         cond = True
         while cond:
             try:
-                userinput = int(input("Veuillez selectionner un produit (1-5) : "))
+                userinput = int(input("Votre choix : "))
+
                 if userinput in range(1, 6):
                     cond = False
                 else:
@@ -221,7 +225,6 @@ class Interface:
         """
 
         print("RECHERCHE DE VOTRE SUBSTITUT VEUILLEZ PATIENTER.")
-        print(productid)
         read = Readmanager()
 
         listcateids = read.readproductcatecateid(productid)
@@ -302,17 +305,17 @@ class Interface:
                 elif scoresubstitute < scoreref:
                     substituteid = prodid
                     break
-                elif scoresubstitute <= scoreref:
-                    substituteid = prodid
-                    break
+                # elif scoresubstitute <= scoreref:
+                #     substituteid = prodid
+                #     break
 
+            if substituteid is None:
+                print("Pas de substituts valables trouvés")
             write = Writemanager()
-            print(substituteid)
             baseproductinfos = read.selectproductdata(productid)
             surrogateinfos = read.selectproductdata(substituteid)
             surrogateshops = read.readproductshopshop(substituteid)
-            if substituteid is None:
-                print("Pas de substituts valables trouvés")
+
             for items in surrogateinfos:
                 if items is None:
                     items = "Pas d'infos"

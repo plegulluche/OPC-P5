@@ -57,13 +57,13 @@ class Apimanager:
         eight = self.geteightcategories()
         productsliste = []
         for category in eight:
-            for page in tqdm(range(1, 11)):
+            for page in tqdm(range(1, 5)):
                 r2 = requests.get(
                     "https://fr.openfoodfacts.org/cgi/search.pl?action=process"
                     + "&tagtype_0=categories&tag_contains_0=contains&tag_0={}".format(
                         category
                     )
-                    + "&tag_contains_1=contains&tag_1=france&page_size=50"
+                    + "&tag_contains_1=contains&tag_1=france&page_size=500"
                     + "&fields=url,categories_tags_fr,product_name,stores_tags"
                     + ",nutriscore_grade&tagtype_1=purchase_places&sort_by="
                     + "unique_scans_n&json=1&page={}".format(page)
